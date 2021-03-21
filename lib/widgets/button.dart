@@ -12,10 +12,8 @@ class Button extends StatelessWidget {
       onPressed: () => onPressed,
       style: ElevatedButton.styleFrom(
         primary: Colors.amber[600],
-        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-        textStyle: TextStyle(
-          fontSize: 15,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         shape: new RoundedRectangleBorder(
           borderRadius: new BorderRadius.circular(30.0),
         ),

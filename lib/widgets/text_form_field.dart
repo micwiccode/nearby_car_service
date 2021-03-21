@@ -44,7 +44,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
             width: 0.8,
           ),
         ),
-        contentPadding: EdgeInsets.all(20.0),
+        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         filled: true,
         fillColor: Colors.white,
         suffixIcon: widget.suffixIcon,

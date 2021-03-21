@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nearby_car_service/utils/authentication.dart';
 
 import '../widgets/text_form_field.dart';
 import '../widgets/button.dart';
+import 'google_sign_in_button.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -30,26 +32,32 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 30,
                   fontWeight: FontWeight.bold),
             )),
-        Container(
-          margin: EdgeInsets.all(6.0),
-          width: 80.0,
-          height: 80.0,
-          decoration:
-              BoxDecoration(shape: BoxShape.circle, color: Colors.amber[600]),
-          child: Icon(
-            Icons.login,
-            color: Colors.black,
-            size: 30.0,
-          ),
+        Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              'Sign in using',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            )),
+        FutureBuilder(
+          future: Authentication.initializeFirebase(context: context),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error initializing Firebase');
+            } else if (snapshot.connectionState == ConnectionState.done) {
+              return GoogleSignInButton();
+            }
+            return CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Colors.amber,
+              ),
+            );
+          },
         ),
         Padding(
             padding: EdgeInsets.all(10.0),
             child: Text(
-              'Log in',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
+              'Or use your email account',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             )),
         Padding(
             padding: EdgeInsets.all(10.0),

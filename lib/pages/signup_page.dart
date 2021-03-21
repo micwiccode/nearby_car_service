@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nearby_car_service/utils/authentication.dart';
 
 import '../widgets/text_form_field.dart';
 import '../widgets/button.dart';
+import 'google_sign_in_button.dart';
 
 class SignupPage extends StatefulWidget {
   SignupPage({Key? key}) : super(key: key);
@@ -22,30 +24,38 @@ class _SignupPageState extends State<SignupPage> {
       child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  'Nearby car service',
-                  style: GoogleFonts.lato(
-                      color: Colors.black,
-                      letterSpacing: .5,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold),
-                )),
             Icon(
               Icons.account_circle,
               color: Colors.amber[600],
               size: 80.0,
             ),
-            Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  'Sign up',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                )),
+                   Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              'Sign up  to join',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            )),
+        FutureBuilder(
+          future: Authentication.initializeFirebase(context: context),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error initializing Firebase');
+            } else if (snapshot.connectionState == ConnectionState.done) {
+              return GoogleSignInButton();
+            }
+            return CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Colors.amber,
+              ),
+            );
+          },
+        ),
+        Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              'Or use your email account',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            )),
             Padding(
               padding: EdgeInsets.all(10.0),
               child: TextFormFieldWidget(

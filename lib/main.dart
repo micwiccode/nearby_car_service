@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.yellow[900],
         accentColor: Colors.yellow[800],
-        fontFamily: 'Georgia',
+        fontFamily: 'Montserrat',
         scaffoldBackgroundColor: Colors.grey[50],
         buttonTheme: ButtonThemeData(
           buttonColor: Colors.yellow,
