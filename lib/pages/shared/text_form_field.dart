@@ -5,9 +5,11 @@ class TextFormFieldWidget extends StatefulWidget {
   final Widget? suffixIcon;
   final bool obscureText;
   final Function? functionValidate;
+  final void Function(String)? onChanged;
 
   TextFormFieldWidget({
     required this.labelText,
+    required this.onChanged,
     this.suffixIcon,
     this.obscureText = false,
     this.functionValidate,
@@ -22,6 +24,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
   Widget build(BuildContext context) {
     return TextFormField(
       obscureText: widget.obscureText,
+      onChanged: widget.onChanged,
       validator: (value) {
         if (widget.functionValidate != null) {
           return widget.functionValidate!(value);
