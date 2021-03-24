@@ -75,18 +75,6 @@ class _SignUpPageState extends State<SignUpPage> {
                           'Or use your email account',
                           style: TextStyle(fontSize: 12, color: Colors.grey),
                         )),
-                    // Padding(
-                    //   padding: EdgeInsets.all(10.0),
-                    //   child: TextFormFieldWidget(
-                    //     labelText: "Name",
-                    //     functionValidate: (String? name) {
-                    //       if (name == null || name.trim().isEmpty) {
-                    //         return 'Please enter name';
-                    //       }
-                    //       return null;
-                    //     },
-                    //   ),
-                    // ),
                     Padding(
                         padding: EdgeInsets.all(10.0),
                         child: TextFormFieldWidget(

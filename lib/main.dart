@@ -24,38 +24,38 @@ class MyApp extends StatelessWidget {
           }
 
           if (snapshot.connectionState == ConnectionState.done) {
-            return App();
+            return _buildApp();
           }
 
           return LoadingSpinner();
         });
   }
-}
 
-Widget App() {
-  return StreamProvider<User?>.value(
-    initialData: null,
-    value: AuthService().user,
-    child: MaterialApp(
-      title: 'Nearby car service app',
-      theme: ThemeData(
-        primaryColor: Colors.yellow[900],
-        accentColor: Colors.yellow[800],
-        fontFamily: 'Montserrat',
-        scaffoldBackgroundColor: Colors.grey[50],
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.yellow,
-          textTheme: ButtonTextTheme.primary,
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            primary: Colors.blueGrey[900],
+  Widget _buildApp() {
+    return StreamProvider<User?>.value(
+      initialData: null,
+      value: AuthService().user,
+      child: MaterialApp(
+        title: 'Nearby car service app',
+        theme: ThemeData(
+          primaryColor: Colors.amber[700],
+          accentColor: Colors.amber[600],
+          fontFamily: 'Montserrat',
+          scaffoldBackgroundColor: Colors.grey[50],
+          buttonTheme: ButtonThemeData(
+            buttonColor: Colors.yellow,
+            textTheme: ButtonTextTheme.primary,
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              primary: Colors.blueGrey[900],
+            ),
           ),
         ),
+        routes: {
+          '/': (context) => MainWrapper(),
+        },
       ),
-      routes: {
-        '/': (context) => MainWrapper(),
-      },
-    ),
-  );
+    );
+  }
 }

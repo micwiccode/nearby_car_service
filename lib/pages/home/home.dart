@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
 
+import 'onboarding_page.dart';
+
 class Home extends StatelessWidget {
   final AuthService _auth = AuthService();
 
@@ -12,20 +14,19 @@ class Home extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-      title: const Text('Nearby car service'),
-      backgroundColor: Colors.amber[600],
-      elevation: 0.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(10),
+          title: const Text('Nearby car service'),
+          backgroundColor: Colors.amber,
+          elevation: 0.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(10),
+            ),
+          ),
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.account_circle), onPressed: handleSignOut),
+          ],
         ),
-      ),
-      actions: <Widget>[
-        ElevatedButton.icon(
-            icon: Icon(Icons.account_circle, color: Colors.white),
-            label: Text('Profile'),
-            onPressed: handleSignOut)
-      ],
-    ));
+        body: OnboardingPage());
   }
 }
