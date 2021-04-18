@@ -1,107 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/enum_to_list.dart';
 import 'package:nearby_car_service/helpers/get_year_to_now.dart';
+import 'package:nearby_car_service/models/address.dart';
+import 'package:nearby_car_service/models/app_user.dart';
+import 'package:nearby_car_service/models/car.dart';
+import 'package:nearby_car_service/models/employee.dart';
+import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/text_form_field.dart';
 import 'package:nearby_car_service/pages/shared/workshop_avatar.dart';
+import 'package:provider/provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-
-enum UserRole { owner, employee, client }
-enum EmployeePositions { coowner, mechanic, mechanicMaster, mechanicAssistant }
-enum FuelType { petrol, gas, diesel, hybrid, electric }
-
-class Address {
-  String street = '';
-  String streetNumber = '';
-  String city = '';
-  String zipCode = '';
-
-  Address(
-      {this.street = '',
-      this.streetNumber = '',
-      this.city = '',
-      this.zipCode = ''});
-
-  @override
-  String toString() => "$street, $streetNumber, $city, $zipCode";
-}
-
-class Workshop {
-  String name;
-  Address? address;
-  String email;
-  String phoneNumber;
-  String? avatar;
-
-  Workshop({
-    this.name = '',
-    this.email = '',
-    this.phoneNumber = '',
-    this.address,
-    this.avatar,
-  });
-
-  String workshopAsString() {
-    return '#$name $email';
-  }
-
-  bool userFilterByName(String filter) {
-    return name.contains(filter) ||
-        address?.city != null &&
-            (address!.city.contains(filter) ||
-                address!.street.contains(filter));
-  }
-
-  @override
-  String toString() => "$name, $email, $phoneNumber, $address $avatar";
-}
-
-class Employee {
-  List<Workshop>? workshops;
-  String position;
-
-  Employee({this.position = '', this.workshops});
-
-  @override
-  String toString() => "$workshops, $position";
-}
-
-class User {
-  String firstName;
-  String lastName;
-  String phoneNumber;
-  UserRole? role;
-  String? avatar;
-
-  User({
-    this.firstName = '',
-    this.lastName = '',
-    this.phoneNumber = '',
-    this.role,
-    this.avatar,
-  });
-
-  @override
-  String toString() => "$firstName, $lastName, $phoneNumber, $role $avatar";
-}
-
-class Car {
-  String mark;
-  String model;
-  FuelType fuelType;
-  int? productionYear;
-
-  Car({
-    this.mark = '',
-    this.model = '',
-    this.fuelType = FuelType.petrol,
-    this.productionYear,
-  });
-
-  @override
-  String toString() => "$mark, $model, $fuelType, $productionYear";
-}
 
 class OnboardingPage extends StatefulWidget {
   @override
@@ -109,7 +20,8 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  User _user = User(role: UserRole.client);
+  final user = Provider.of<User?>(context);
+  AppUser _user = AppUser(role: AppUserRole.client, uid: user.uid);
   Workshop _workshop = Workshop(
     name: '',
     email: '',
@@ -182,9 +94,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case 2:
         return Form(key: _roleSelectFormKey, child: buildRoleSelect());
       case 3:
-        if (_user.role == UserRole.client)
+        if (_user.role == AppUserRole.client)
           return Form(key: _clientFormKey, child: buildClientForm());
-        else if (_user.role == UserRole.employee)
+        else if (_user.role == AppUserRole.employee)
           return Form(key: _employeeFormKey, child: buildEmployeeForm());
         return Form(key: _ownerFormKey, child: buildOwnerForm());
       default:
@@ -220,11 +132,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
       return true;
     } else {
       switch (_user.role) {
-        case UserRole.client:
+        case AppUserRole.client:
           return _userDetailsFormKey.currentState!.validate();
-        case UserRole.employee:
+        case AppUserRole.employee:
           return _employeeFormKey.currentState!.validate();
-        case UserRole.owner:
+        case AppUserRole.owner:
           return _ownerFormKey.currentState!.validate();
         default:
           return _userDetailsFormKey.currentState!.validate();
@@ -278,9 +190,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
             'Later you will be able to add new role to your account',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildRadioButton('Client', UserRole.client),
-      buildRadioButton('Employee', UserRole.employee),
-      buildRadioButton('Owner', UserRole.owner),
+      buildRadioButton('Client', AppUserRole.client),
+      buildRadioButton('Employee', AppUserRole.employee),
+      buildRadioButton('Owner', AppUserRole.owner),
     ])));
   }
 
@@ -391,7 +303,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     ])));
   }
 
-  Widget buildTextField(String text, String value, {bool? onlyDigits}) {
+  Widget buildTextField(String text, String? value, {bool? onlyDigits}) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: TextFormFieldWidget(
@@ -410,12 +322,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Widget buildRadioButton(String text, UserRole value) {
-    return RadioListTile<UserRole>(
+  Widget buildRadioButton(String text, AppUserRole value) {
+    return RadioListTile<AppUserRole>(
       title: Text(text),
       value: value,
       groupValue: _user.role,
-      onChanged: (UserRole? value) {
+      onChanged: (AppUserRole? value) {
         setState(() => _user.role = value);
       },
     );

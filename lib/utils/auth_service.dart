@@ -2,50 +2,58 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:nearby_car_service/models/app_user.dart';
+
+import 'database.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  AppUser? _userFromFirebase(User? user) {
+    return user != null ? AppUser(uid: user.uid) : null;
+  }
 
   Stream<User?> get user {
     return _auth.authStateChanges();
   }
 
-  Future<User?> signInAnonymous() async {
+  Future<AppUser?> signInAnonymous() async {
     try {
       UserCredential result = await _auth.signInAnonymously();
       User? user = result.user;
-      return user;
+      return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
       return null;
     }
   }
 
-  Future<User?> signIn(String email, String password) async {
+  Future<AppUser?> signIn(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      return user;
+      DatabaseService(uid: user!.uid);
+      return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
       return null;
     }
   }
 
-  Future<User?> signUp(String email, String password) async {
+  Future<AppUser?> signUp(String email, String password) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      return user;
+      return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
       return null;
     }
   }
 
-  Future<User?> signInWithGoogle({required BuildContext context}) async {
+  Future<AppUser?> signInWithGoogle({required BuildContext context}) async {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
 
@@ -79,7 +87,7 @@ class AuthService {
       }
     }
 
-    return user;
+    return _userFromFirebase(user);
   }
 
   Future<void> signOut({required BuildContext context}) async {

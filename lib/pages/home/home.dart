@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
+import 'package:nearby_car_service/utils/database.dart';
+import 'package:provider/provider.dart';
+import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
 
 import 'onboarding_page.dart';
@@ -9,29 +13,36 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    handleSignOut() async {
+    final appUser = Provider.of<AppUser>(context);
+
+    void handleSignOut() async {
       await _auth.signOut(context: context);
     }
 
-    bool isOnboardingCompleted() {
-      return true;
-    }
-
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Nearby car service'),
-          backgroundColor: Colors.amber,
-          elevation: 0.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(10),
-            ),
-          ),
-          actions: <Widget>[
-            IconButton(
-                icon: Icon(Icons.account_circle), onPressed: handleSignOut),
-          ],
-        ),
-        body: isOnboardingCompleted() ? MainMenuPage() : OnboardingPage());
+    return StreamBuilder<AppUser>(
+        stream: DatabaseService(uid: appUser.uid).appUser,
+        builder: (context, snapshot) {
+          return Scaffold(
+              appBar: AppBar(
+                title: const Text('Nearby car service'),
+                backgroundColor: Colors.amber,
+                elevation: 0.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(10),
+                  ),
+                ),
+                actions: <Widget>[
+                  IconButton(
+                      icon: Icon(Icons.account_circle),
+                      onPressed: handleSignOut),
+                ],
+              ),
+              body: snapshot.hasData
+                  ? LoadingSpinner()
+                  : snapshot.data == null
+                      ? OnboardingPage()
+                      : MainMenuPage());
+        });
   }
 }
