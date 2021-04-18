@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
 
 import 'onboarding_page.dart';
+import 'main_menu_page.dart';
 
 class Home extends StatelessWidget {
   final AuthService _auth = AuthService();
@@ -10,6 +11,10 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     handleSignOut() async {
       await _auth.signOut(context: context);
+    }
+
+    bool isOnboardingCompleted() {
+      return true;
     }
 
     return Scaffold(
@@ -27,6 +32,6 @@ class Home extends StatelessWidget {
                 icon: Icon(Icons.account_circle), onPressed: handleSignOut),
           ],
         ),
-        body: OnboardingPage());
+        body: isOnboardingCompleted() ? MainMenuPage() : OnboardingPage());
   }
 }
