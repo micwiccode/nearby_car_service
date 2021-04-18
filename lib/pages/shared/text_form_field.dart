@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TextFormFieldWidget extends StatefulWidget {
   final String labelText;
   final Widget? suffixIcon;
   final bool obscureText;
   final Function? functionValidate;
+  final bool onlyDigits;
   final void Function(String)? onChanged;
 
   TextFormFieldWidget({
@@ -12,6 +14,7 @@ class TextFormFieldWidget extends StatefulWidget {
     required this.onChanged,
     this.suffixIcon,
     this.obscureText = false,
+    this.onlyDigits = false,
     this.functionValidate,
   });
 
@@ -31,6 +34,11 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
         }
         return null;
       },
+      keyboardType:
+          widget.onlyDigits ? TextInputType.number : TextInputType.text,
+      inputFormatters: widget.onlyDigits
+          ? <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly]
+          : [],
       decoration: InputDecoration(
         labelText: widget.labelText,
         enabledBorder: OutlineInputBorder(

@@ -77,8 +77,8 @@ class _SignInPageState extends State<SignInPage> {
                           onChanged: (value) {
                             setState(() => email = value);
                           },
-                          functionValidate: (String? emial) {
-                            if (emial == null || emial.trim().isEmpty) {
+                          functionValidate: (String? email) {
+                            if (email == null || email.trim().isEmpty) {
                               return 'Please enter email';
                             }
                             return null;
