@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nearby_car_service/models/app_user.dart';
 
 class MainMenuPage extends StatefulWidget {
-  const MainMenuPage({Key? key}) : super(key: key);
+  final AppUser user;
+  const MainMenuPage({required this.user, Key? key}) : super(key: key);
 
   @override
   _MainMenuPageState createState() => _MainMenuPageState();

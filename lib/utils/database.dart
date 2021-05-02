@@ -7,22 +7,35 @@ class DatabaseService {
   final CollectionReference collection =
       FirebaseFirestore.instance.collection('appUsers');
 
-  Future createAppUser(firstName, lastName, phoneNumber, role, avatar) async {
-    return await _setAppUser(firstName, lastName, phoneNumber, role, avatar);
+  Future createAppUser(AppUser user) async {
+    return await _setAppUser(user);
   }
 
-  Future updateAppUser(firstName, lastName, phoneNumber, role, avatar) async {
-    return await _setAppUser(firstName, lastName, phoneNumber, role, avatar);
+  Future updateAppUser(AppUser user) async {
+    return await _setAppUser(user);
   }
 
-  Future<void> _setAppUser(firstName, lastName, phoneNumber, role, avatar) {
+  Future updateAppUserRole(String role) async {
+    return collection.doc(uid).update({'role': role, 'onboardingStep': 3});
+  }
+
+  Future updateAppUserOnboardingStep(int step) async {
+    return collection.doc(uid).update({'onboardingStep': step});
+  }
+
+  Future<void> _setAppUser(AppUser user) {
     return collection.doc(uid).set({
-      'firstName': firstName,
-      'lastName': lastName,
-      'phoneNumber': phoneNumber,
-      'role': role,
-      'avatar': avatar
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'phoneNumber': user.phoneNumber,
+      'role': user.role,
+      'avatar': user.avatar,
+      'onboardingStep': user.onboardingStep ?? 1,
     });
+  }
+
+  Stream<AppUser> get appUser {
+    return collection.doc(uid).snapshots().map(_appUserFromSnapshot);
   }
 
   AppUser _appUserFromSnapshot(DocumentSnapshot snapshot) {
@@ -33,10 +46,7 @@ class DatabaseService {
       phoneNumber: snapshot.data()!['phoneNumber'] ?? '',
       role: snapshot.data()!['role'] ?? '',
       avatar: snapshot.data()!['avatar'] ?? '',
+      onboardingStep: snapshot.data()!['onboardingStep'] ?? 1,
     );
-  }
-
-  Stream<AppUser> get appUser {
-    return collection.doc(uid).snapshots().map(_appUserFromSnapshot);
   }
 }

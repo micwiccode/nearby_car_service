@@ -13,15 +13,19 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appUser = Provider.of<AppUser>(context);
+    final appUser = Provider.of<AppUser?>(context);
 
     void handleSignOut() async {
       await _auth.signOut(context: context);
     }
 
     return StreamBuilder<AppUser>(
-        stream: DatabaseService(uid: appUser.uid).appUser,
+        stream: DatabaseService(uid: appUser!.uid).appUser,
+        initialData: null,
         builder: (context, snapshot) {
+          print(snapshot.data);
+          print(snapshot.error);
+
           return Scaffold(
               appBar: AppBar(
                 title: const Text('Nearby car service'),
@@ -38,11 +42,11 @@ class Home extends StatelessWidget {
                       onPressed: handleSignOut),
                 ],
               ),
-              body: snapshot.hasData
+              body: !snapshot.hasData
                   ? LoadingSpinner()
-                  : snapshot.data == null
-                      ? OnboardingPage()
-                      : MainMenuPage());
+                  : snapshot.data == null || snapshot.data!.onboardingStep! < 4
+                      ? OnboardingPage(user: snapshot.data)
+                      : MainMenuPage(user: snapshot.data!));
         });
   }
 }

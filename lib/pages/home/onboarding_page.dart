@@ -4,24 +4,29 @@ import 'package:nearby_car_service/helpers/enum_to_list.dart';
 import 'package:nearby_car_service/helpers/get_year_to_now.dart';
 import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
+import 'package:nearby_car_service/models/app_user_role.dart';
 import 'package:nearby_car_service/models/car.dart';
 import 'package:nearby_car_service/models/employee.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/text_form_field.dart';
 import 'package:nearby_car_service/pages/shared/workshop_avatar.dart';
+import 'package:nearby_car_service/utils/database.dart';
 import 'package:provider/provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class OnboardingPage extends StatefulWidget {
+  final AppUser? user;
+  OnboardingPage({required this.user, Key? key}) : super(key: key);
+
   @override
   _OnboardingPageState createState() => _OnboardingPageState();
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  final user = Provider.of<User?>(context);
-  AppUser _user = AppUser(role: AppUserRole.client, uid: user.uid);
+  late DatabaseService databaseService;
+  late AppUser _user;
   Workshop _workshop = Workshop(
     name: '',
     email: '',
@@ -30,7 +35,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   );
   Employee _employee = Employee(workshops: []);
   Car _car = Car();
-  int _step = 2;
+  int _step = 1;
 
   final GlobalKey<FormState> _roleSelectFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _userDetailsFormKey = GlobalKey<FormState>();
@@ -59,18 +64,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
             city: 'City')),
   ];
 
-  void setUser(_userData) {
-    setState(() => _user = _userData);
-  }
-
-  void setWorkshop(_workshopData) {
-    setState(() => _workshop = _workshopData);
-  }
-
-  void setEmployee(_employeeData) {
-    setState(() => _employee = _employeeData);
-  }
-
   void setEmployeeWorkshop(workshop) {
     _employee.workshops = [workshop];
   }
@@ -94,9 +87,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case 2:
         return Form(key: _roleSelectFormKey, child: buildRoleSelect());
       case 3:
-        if (_user.role == AppUserRole.client)
+        if (_user.role == AppUserRole.ROLE_CLIENT)
           return Form(key: _clientFormKey, child: buildClientForm());
-        else if (_user.role == AppUserRole.employee)
+        else if (_user.role == AppUserRole.ROLE_EMPLOYEE)
           return Form(key: _employeeFormKey, child: buildEmployeeForm());
         return Form(key: _ownerFormKey, child: buildOwnerForm());
       default:
@@ -104,48 +97,75 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
   }
 
-  void goNext() {
-    if (isValidStep()) {
-      setState(() => _step = _step + 1);
-    }
-  }
-
-  void goBack() {
-    setState(() => _step < 2 ? 1 : _step--);
-  }
-
-  void submitOnboarding() {
-    if (isValidStep()) {
-      // save into firebase
-    }
-    print(_user);
-    print(_employee);
-    print(_car);
-    print(_workshop);
-  }
-
-  bool isValidStep() {
-    if (_step == 1) {
-      return _userDetailsFormKey.currentState!.validate();
-    }
-    if (_step == 2) {
-      return true;
-    } else {
-      switch (_user.role) {
-        case AppUserRole.client:
-          return _userDetailsFormKey.currentState!.validate();
-        case AppUserRole.employee:
-          return _employeeFormKey.currentState!.validate();
-        case AppUserRole.owner:
-          return _ownerFormKey.currentState!.validate();
-        default:
-          return _userDetailsFormKey.currentState!.validate();
-      }
-    }
+  Future<void> skipOnboarding() async {
+    await databaseService.updateAppUserOnboardingStep(4);
   }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.user);
+    void initateOnbordingStep() {
+      setState(() => _step = widget.user!.onboardingStep!);
+    }
+
+    final appUser = Provider.of<AppUser?>(context);
+    databaseService = DatabaseService(uid: appUser!.uid);
+    print(widget.user!.onboardingStep);
+    if (widget.user?.onboardingStep != null) {
+      setState(() => _user = widget.user!);
+      initateOnbordingStep();
+    } else {
+      setState(() => _user = AppUser(
+          uid: appUser.uid, role: AppUserRole.ROLE_CLIENT, onboardingStep: 2));
+    }
+
+    bool isValidStep() {
+      if (_step == 1) {
+        return _userDetailsFormKey.currentState!.validate();
+      }
+      if (_step == 2) {
+        return true;
+      } else {
+        switch (_user.role) {
+          case AppUserRole.ROLE_CLIENT:
+            return _clientFormKey.currentState!.validate();
+          case AppUserRole.ROLE_EMPLOYEE:
+            return _employeeFormKey.currentState!.validate();
+          case AppUserRole.ROLE_OWNER:
+            return _ownerFormKey.currentState!.validate();
+          default:
+            return _userDetailsFormKey.currentState!.validate();
+        }
+      }
+    }
+
+    Future<void> saveStepState() async {
+      if (_step == 1) {
+        await databaseService.createAppUser(_user);
+      } else if (_step == 2) {
+        await databaseService
+            .updateAppUserRole(_user.role ?? AppUserRole.ROLE_CLIENT);
+      } else {
+        // switch (_user.role) {
+        //   case AppUserRole.client:
+        //     return _clientFormKey.currentState!.validate();
+        //   case AppUserRole.employee:
+        //     return _employeeFormKey.currentState!.validate();
+        //   case AppUserRole.owner:
+        //     return _ownerFormKey.currentState!.validate();
+        //   default:
+        //     return _userDetailsFormKey.currentState!.validate();
+        // }
+      }
+    }
+
+    Future<void> goNext() async {
+      if (isValidStep()) {
+        await saveStepState();
+        setState(() => _step = _step + 1);
+      }
+    }
+
     return Container(
         padding: const EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 20.0),
         child: SingleChildScrollView(
@@ -167,11 +187,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               padding: EdgeInsets.all(10.0),
               child: _step < 3
                   ? Button(text: 'Next', onPressed: goNext)
-                  : Button(text: 'Save', onPressed: submitOnboarding)),
-          if (_step > 1)
-            Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Button(text: 'Back', onPressed: goBack))
+                  : Button(text: 'Save', onPressed: saveStepState)),
         ])));
   }
 
@@ -190,9 +206,24 @@ class _OnboardingPageState extends State<OnboardingPage> {
             'Later you will be able to add new role to your account',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildRadioButton('Client', AppUserRole.client),
-      buildRadioButton('Employee', AppUserRole.employee),
-      buildRadioButton('Owner', AppUserRole.owner),
+      buildRadioButton(
+          'Client',
+          AppUserRole.ROLE_CLIENT,
+          (value) => setState(() {
+                _user.role = value;
+              })),
+      buildRadioButton(
+          'Employee',
+          AppUserRole.ROLE_EMPLOYEE,
+          (value) => setState(() {
+                _user.role = value;
+              })),
+      buildRadioButton(
+          'Owner',
+          AppUserRole.ROLE_OWNER,
+          (value) => setState(() {
+                _user.role = value;
+              })),
     ])));
   }
 
@@ -211,9 +242,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
             'Later you will be able to edit that information',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildTextField('First name', _user.firstName),
-      buildTextField('Last name', _user.lastName),
-      buildTextField('Phone number', _user.phoneNumber, onlyDigits: true),
+      buildTextField('First name', _user.firstName,
+          (val) => setState(_user.firstName = val)),
+      buildTextField(
+          'Last name', _user.lastName, (val) => setState(_user.lastName = val)),
+      buildTextField('Phone number', _user.phoneNumber,
+          (val) => setState(_user.phoneNumber = val),
+          onlyDigits: true),
     ])));
   }
 
@@ -232,12 +267,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
             'Later you will be able to edit that information',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildTextField('Car mark', _car.mark),
-      buildTextField('Car model', _car.model),
+      buildTextField('Car mark', _car.mark, (val) => setState(_car.mark = val)),
+      buildTextField(
+          'Car model', _car.model, (val) => setState(_car.model = val)),
       buildDropdown('Fuel', _car.fuelType, enumToList(FuelType.values),
           changeCarFuelType),
       buildDropdown('Production year', _car.productionYear, getYearsToNow(1950),
-          changeCarProductionYear)
+          changeCarProductionYear),
+      GestureDetector(
+          onTap: skipOnboarding,
+          child:
+              Text("Finish, I'll do it later", style: TextStyle(fontWeight: FontWeight.bold))),
     ])));
   }
 
@@ -281,35 +321,48 @@ class _OnboardingPageState extends State<OnboardingPage> {
             'Later you will be able to edit that information',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildTextField('Workshop name', _workshop.name),
+      buildTextField('Workshop name', _workshop.name,
+          (val) => setState(_workshop.name = val)),
       Padding(
           padding: EdgeInsets.all(10.0),
           child: Text(
             'Workshop contact',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildTextField('Email', _workshop.email),
-      buildTextField('Phone number', _workshop.phoneNumber, onlyDigits: true),
+      buildTextField(
+          'Email', _workshop.email, (val) => setState(_workshop.email = val)),
+      buildTextField('Phone number', _workshop.phoneNumber,
+          (val) => setState(_workshop.phoneNumber = val),
+          onlyDigits: true),
       Padding(
           padding: EdgeInsets.all(10.0),
           child: Text(
             'Workshop address',
             style: TextStyle(fontSize: 12, color: Colors.grey),
           )),
-      buildTextField('Street', _workshop.address!.street),
-      buildTextField('Street Number', _workshop.address!.streetNumber),
-      buildTextField('Zip code', _workshop.address!.zipCode, onlyDigits: true),
-      buildTextField('City', _workshop.address!.city),
+      buildTextField('Street', _workshop.address!.street,
+          (val) => setState(_workshop.address!.street = val)),
+      buildTextField('Street Number', _workshop.address!.streetNumber,
+          (val) => setState(_workshop.address!.streetNumber = val)),
+      buildTextField(
+        'Zip code',
+        _workshop.address!.zipCode,
+        (val) => setState(_workshop.address!.zipCode = val),
+        onlyDigits: true,
+      ),
+      buildTextField('City', _workshop.address!.city,
+          (val) => setState(_workshop.address!.city = val)),
     ])));
   }
 
-  Widget buildTextField(String text, String? value, {bool? onlyDigits}) {
+  Widget buildTextField(String text, String? value, onChanged,
+      {bool? onlyDigits}) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: TextFormFieldWidget(
         labelText: text,
         onChanged: (val) {
-          setState(() => value = val);
+          onChanged(val);
         },
         onlyDigits: onlyDigits ?? false,
         functionValidate: (String? value) {
@@ -322,15 +375,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Widget buildRadioButton(String text, AppUserRole value) {
-    return RadioListTile<AppUserRole>(
-      title: Text(text),
-      value: value,
-      groupValue: _user.role,
-      onChanged: (AppUserRole? value) {
-        setState(() => _user.role = value);
-      },
-    );
+  Widget buildRadioButton(String text, String value, onChanged) {
+    return RadioListTile<String>(
+        title: Text(text),
+        value: value,
+        groupValue: _user.role,
+        onChanged: (val) => onChanged(val));
   }
 
   Widget buildDropdown(String label, selectedItem, items, onChanged) {

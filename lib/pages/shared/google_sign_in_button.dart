@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
 
 class GoogleSignInButton extends StatefulWidget {
@@ -29,8 +30,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               onTap: () async {
                 setState(() => {_isSigningIn = true});
 
-                User? user =
-                    await _auth.signInWithGoogle(context: context);
+                AppUser? user = await _auth.signInWithGoogle(context: context);
 
                 setState(() => {_isSigningIn = false});
 

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'models/app_user.dart';
 import 'pages/main_wrapper.dart';
 import 'pages/shared/error_message.dart';
 import 'pages/shared/loading_spinner.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _buildApp() {
-    return StreamProvider<User?>.value(
+    return StreamProvider<AppUser?>.value(
       initialData: null,
       value: AuthService().user,
       child: MaterialApp(
