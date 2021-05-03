@@ -1,5 +1,3 @@
-import 'app_user_role.dart';
-
 class AppUser {
   final String uid;
   String? firstName;

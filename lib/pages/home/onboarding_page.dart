@@ -103,14 +103,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.user);
     void initateOnbordingStep() {
       setState(() => _step = widget.user!.onboardingStep!);
     }
 
     final appUser = Provider.of<AppUser?>(context);
     databaseService = DatabaseService(uid: appUser!.uid);
-    print(widget.user!.onboardingStep);
+
     if (widget.user?.onboardingStep != null) {
       setState(() => _user = widget.user!);
       initateOnbordingStep();
@@ -276,8 +275,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
           changeCarProductionYear),
       GestureDetector(
           onTap: skipOnboarding,
-          child:
-              Text("Finish, I'll do it later", style: TextStyle(fontWeight: FontWeight.bold))),
+          child: Text("Finish, I'll do it later",
+              style: TextStyle(fontWeight: FontWeight.bold))),
     ])));
   }
 

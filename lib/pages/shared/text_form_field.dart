@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 class TextFormFieldWidget extends StatefulWidget {
   final String labelText;
+  final String? initialValue;
   final Widget? suffixIcon;
   final bool obscureText;
   final Function? functionValidate;
@@ -12,6 +13,7 @@ class TextFormFieldWidget extends StatefulWidget {
   TextFormFieldWidget({
     required this.labelText,
     required this.onChanged,
+    this.initialValue,
     this.suffixIcon,
     this.obscureText = false,
     this.onlyDigits = false,
@@ -39,6 +41,7 @@ class _TextFormFieldWidgetState extends State<TextFormFieldWidget> {
       inputFormatters: widget.onlyDigits
           ? <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly]
           : [],
+      initialValue: widget.initialValue,
       decoration: InputDecoration(
         labelText: widget.labelText,
         enabledBorder: OutlineInputBorder(

@@ -12,6 +12,7 @@ class DatabaseService {
   }
 
   Future updateAppUser(AppUser user) async {
+    print(user);
     return await _setAppUser(user);
   }
 

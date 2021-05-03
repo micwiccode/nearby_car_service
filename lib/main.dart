@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'models/app_user.dart';
@@ -16,6 +17,9 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.amber));
+
     return FutureBuilder(
         future: Firebase.initializeApp(),
         builder: (context, snapshot) {
@@ -39,7 +43,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Nearby car service app',
         theme: ThemeData(
-          primaryColor: Colors.amber[700],
+          primaryColor: Colors.amber[600],
           accentColor: Colors.amber[600],
           fontFamily: 'Montserrat',
           scaffoldBackgroundColor: Colors.grey[50],
