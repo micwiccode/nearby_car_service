@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'loading_spinner.dart';
+
 class Button extends StatelessWidget {
   final Function onPressed;
   final String text;
+  final isLoading = false;
 
-  Button({required this.onPressed, required this.text});
+  Button({required this.onPressed, required this.text, isLoading});
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +21,12 @@ class Button extends StatelessWidget {
           borderRadius: new BorderRadius.circular(30.0),
         ),
       ),
-      child: Text(
-        text,
-        style: TextStyle(color: Colors.black),
-      ),
+      child: isLoading
+          ? LoadingSpinner()
+          : Text(
+              text,
+              style: TextStyle(color: Colors.black),
+            ),
     );
   }
 }

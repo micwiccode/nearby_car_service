@@ -9,7 +9,8 @@ pickImage(onImageChange) async {
   PermissionStatus permissionStatus = await Permission.photos.status;
 
   if (permissionStatus.isGranted) {
-    _pickedImage = await _picker.getImage(source: ImageSource.gallery, imageQuality: 20);
+    _pickedImage =
+        await _picker.getImage(source: ImageSource.gallery, imageQuality: 20);
 
     if (_pickedImage != null) {
       onImageChange(_pickedImage.path);

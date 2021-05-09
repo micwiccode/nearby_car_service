@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 
+import 'cars_menu_page.dart';
+
 class MainMenuPage extends StatefulWidget {
   final AppUser user;
   const MainMenuPage({required this.user, Key? key}) : super(key: key);
@@ -18,10 +20,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       'Index 0: Home',
       style: optionStyle,
     ),
-    Text(
-      'Index 1: My cars',
-      style: optionStyle,
-    ),
+    CarsMenuPage(),
     Text(
       'Index 2: Workshops',
       style: optionStyle,

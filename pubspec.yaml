@@ -41,6 +41,7 @@ dependencies:
   permission_handler: ^7.1.0
   firebase_storage: ^8.0.5
   cached_network_image: ^3.0.0
+  uuid: ^3.0.4
 
 dev_dependencies:
   flutter_test:
