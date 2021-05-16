@@ -4,7 +4,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 Future<String?> uploadImage(String? filePath, childRef) async {
   final _storage = FirebaseStorage.instance;
-  print(filePath);
 
   if (filePath == null) {
     return null;

@@ -40,8 +40,6 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
 
-    print(_appUser.avatar);
-
     return Container(
       margin: new EdgeInsets.all(25.0),
       child: SingleChildScrollView(

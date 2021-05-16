@@ -12,12 +12,11 @@ class DatabaseService {
   }
 
   Future updateAppUser(AppUser user) async {
-    print(user);
     return await _setAppUser(user);
   }
 
-  Future updateAppUserRole(String role) async {
-    return collection.doc(uid).update({'role': role, 'onboardingStep': 3});
+  Future updateAppUserRole(List<String> roles) async {
+    return collection.doc(uid).update({'roles': roles, 'onboardingStep': 3});
   }
 
   Future updateAppUserOnboardingStep(int step) async {
@@ -29,7 +28,7 @@ class DatabaseService {
       'firstName': user.firstName,
       'lastName': user.lastName,
       'phoneNumber': user.phoneNumber,
-      'role': user.role,
+      'roles': user.roles,
       'avatar': user.avatar,
       'onboardingStep': user.onboardingStep ?? 1,
     });
@@ -45,7 +44,7 @@ class DatabaseService {
       firstName: snapshot.data()!['firstName'] ?? '',
       lastName: snapshot.data()!['lastName'] ?? '',
       phoneNumber: snapshot.data()!['phoneNumber'] ?? '',
-      role: snapshot.data()!['role'] ?? '',
+      roles: snapshot.data()!['roles'].cast<String>() ?? [],
       avatar: snapshot.data()!['avatar'] ?? '',
       onboardingStep: snapshot.data()!['onboardingStep'] ?? 1,
     );

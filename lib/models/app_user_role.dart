@@ -1,5 +1,5 @@
 class AppUserRole {
-  static const String ROLE_CLIENT="CLIENT";
-  static const String ROLE_OWNER="OWNER";
-  static const String ROLE_EMPLOYEE="EMPLOYEE";
+  static const String CLIENT="CLIENT";
+  static const String OWNER="OWNER";
+  static const String EMPLOYEE="EMPLOYEE";
 }

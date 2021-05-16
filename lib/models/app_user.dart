@@ -3,7 +3,7 @@ class AppUser {
   String? firstName;
   String? lastName;
   String? phoneNumber;
-  String? role;
+  List<String>? roles;
   String? avatar;
   int? onboardingStep;
 
@@ -12,12 +12,12 @@ class AppUser {
     this.firstName = '',
     this.lastName = '',
     this.phoneNumber = '',
-    this.role,
+    this.roles,
     this.avatar,
     this.onboardingStep = 1,
   });
 
   @override
   String toString() =>
-      "$firstName, $lastName, $phoneNumber, $role, $avatar, $onboardingStep";
+      "$firstName, $lastName, $phoneNumber, $roles, $avatar, $onboardingStep";
 }

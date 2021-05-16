@@ -16,6 +16,8 @@ import 'package:provider/provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
+
 class OnboardingPage extends StatefulWidget {
   final AppUser? user;
   OnboardingPage({required this.user, Key? key}) : super(key: key);
@@ -87,9 +89,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case 2:
         return Form(key: _roleSelectFormKey, child: buildRoleSelect());
       case 3:
-        if (_user.role == AppUserRole.ROLE_CLIENT)
+        if (_user.roles!.contains(ROLES.CLIENT))
           return Form(key: _clientFormKey, child: buildClientForm());
-        else if (_user.role == AppUserRole.ROLE_EMPLOYEE)
+        else if (_user.roles!.contains(ROLES.EMPLOYEE))
           return Form(key: _employeeFormKey, child: buildEmployeeForm());
         return Form(key: _ownerFormKey, child: buildOwnerForm());
       default:
@@ -114,8 +116,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
       setState(() => _user = widget.user!);
       initateOnbordingStep();
     } else {
-      setState(() => _user = AppUser(
-          uid: appUser.uid, role: AppUserRole.ROLE_CLIENT, onboardingStep: 2));
+      setState(() => _user =
+          AppUser(uid: appUser.uid, roles: [ROLES.CLIENT], onboardingStep: 2));
     }
 
     bool isValidStep() {
@@ -125,12 +127,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
       if (_step == 2) {
         return true;
       } else {
-        switch (_user.role) {
-          case AppUserRole.ROLE_CLIENT:
+        switch (_user.roles![0]) {
+          case ROLES.CLIENT:
             return _clientFormKey.currentState!.validate();
-          case AppUserRole.ROLE_EMPLOYEE:
+          case ROLES.EMPLOYEE:
             return _employeeFormKey.currentState!.validate();
-          case AppUserRole.ROLE_OWNER:
+          case ROLES.OWNER:
             return _ownerFormKey.currentState!.validate();
           default:
             return _userDetailsFormKey.currentState!.validate();
@@ -142,8 +144,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       if (_step == 1) {
         await databaseService.createAppUser(_user);
       } else if (_step == 2) {
-        await databaseService
-            .updateAppUserRole(_user.role ?? AppUserRole.ROLE_CLIENT);
+        await databaseService.updateAppUserRole(_user.roles ?? [ROLES.CLIENT]);
       } else {
         // switch (_user.role) {
         //   case AppUserRole.client:
@@ -207,21 +208,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
           )),
       buildRadioButton(
           'Client',
-          AppUserRole.ROLE_CLIENT,
+          ROLES.CLIENT,
           (value) => setState(() {
-                _user.role = value;
+                _user.roles = [value];
               })),
       buildRadioButton(
           'Employee',
-          AppUserRole.ROLE_EMPLOYEE,
+          ROLES.EMPLOYEE,
           (value) => setState(() {
-                _user.role = value;
+                _user.roles = [value];
               })),
       buildRadioButton(
           'Owner',
-          AppUserRole.ROLE_OWNER,
+          ROLES.OWNER,
           (value) => setState(() {
-                _user.role = value;
+                _user.roles = [value];
               })),
     ])));
   }
@@ -378,7 +379,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return RadioListTile<String>(
         title: Text(text),
         value: value,
-        groupValue: _user.role,
+        groupValue: _user.roles![0],
         onChanged: (val) => onChanged(val));
   }
 

@@ -7,8 +7,8 @@ import 'package:nearby_car_service/utils/auth_service.dart';
 
 import 'drawer.dart';
 import 'onboarding_page.dart';
-import 'main_menu_page.dart';
 import 'profile_page.dart';
+import 'role_based_page.dart';
 
 class Home extends StatelessWidget {
   final AuthService _auth = AuthService();
@@ -27,7 +27,7 @@ class Home extends StatelessWidget {
         stream: DatabaseService(uid: appUser!.uid).appUser,
         initialData: null,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return LoadingSpinner();
           }
 
@@ -47,10 +47,6 @@ class Home extends StatelessWidget {
           }
 
           AppUser user = snapshot.data!;
-          String drawerUserName = '${user.firstName!} ${user.lastName!}';
-          String role = snapshot.data!.role!;
-          String formattedRole =
-              '${role[0].toUpperCase()}${role.substring(1).toLowerCase()}';
 
           void handleOpenProfilePage() {
             Navigator.push(
@@ -61,8 +57,8 @@ class Home extends StatelessWidget {
 
           return Scaffold(
               key: _scaffoldState,
-              endDrawer: CustomDrawer(user.avatar, drawerUserName,
-                  formattedRole, handleOpenProfilePage, handleSignOut),
+              endDrawer:
+                  CustomDrawer(user, handleOpenProfilePage, handleSignOut),
               appBar: AppBar(
                 title: const Text('Nearby car service'),
                 backgroundColor: Colors.amber,
@@ -79,7 +75,7 @@ class Home extends StatelessWidget {
                           _scaffoldState.currentState!.openEndDrawer()),
                 ],
               ),
-              body: MainMenuPage(user: snapshot.data!));
+              body: RoleBasedPage(user: user));
         });
   }
 }
