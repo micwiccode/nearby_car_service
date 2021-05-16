@@ -2,7 +2,11 @@
     package="com.example.nearby_car_service">
    <application
         android:label="nearby_car_service"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/ic_launcher">
+				
+		  	<meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="${MAPS_API_KEY}"/>
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
