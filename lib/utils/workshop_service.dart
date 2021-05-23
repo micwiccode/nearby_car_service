@@ -35,6 +35,10 @@ class WorkshopDatabaseService {
     }
   }
 
+  Future removeWorkshop(String workshopUid) async {
+    return collection.doc(workshopUid).delete();
+  }
+
   Stream<List<Workshop>> get workshops {
     return collection.snapshots().map(_workshopsFromSnapshot);
   }

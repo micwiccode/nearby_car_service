@@ -8,6 +8,8 @@ import 'package:nearby_car_service/utils/workshop_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:nearby_car_service/pages/home/workshop_map.dart';
+import 'package:nearby_car_service/pages/shared/slide_up_manage_panel_content.dart';
+import 'package:nearby_car_service/pages/shared/confirm_dialog.dart';
 import 'workshop_form_page.dart';
 
 class WorkshopMenuPage extends StatefulWidget {
@@ -21,14 +23,10 @@ class _WorkshopMenuPageState extends State<WorkshopMenuPage> {
   @override
   Widget build(BuildContext context) {
     final appUser = Provider.of<AppUser?>(context);
-
-    void handleOpenWorkshopForm(Workshop? workshop) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => WorkshopFormPage(workshop: workshop)),
-      );
-    }
+    final WorkshopDatabaseService workshopDatabaseService =
+        WorkshopDatabaseService(
+      appUserUid: appUser!.uid,
+    );
 
     return StreamBuilder<Workshop>(
       stream: WorkshopDatabaseService(appUserUid: appUser!.uid).myWorkshop,
@@ -52,6 +50,8 @@ class _WorkshopMenuPageState extends State<WorkshopMenuPage> {
         return Scaffold(
             body: SingleChildScrollView(
                 child: _buildWorkshopView(
+                    context: context,
+                    workshopDatabaseService: workshopDatabaseService,
                     workshop: workshop,
                     workshopAddress: workshopAddress,
                     workshopAvatar: workshopAvatar)));
@@ -60,7 +60,36 @@ class _WorkshopMenuPageState extends State<WorkshopMenuPage> {
   }
 }
 
-Widget _buildWorkshopView({workshop, workshopAddress, workshopAvatar}) {
+Widget _buildWorkshopView(
+    {context,
+    workshopDatabaseService,
+    workshop,
+    workshopAddress,
+    workshopAvatar}) {
+  void onEditWorkshop() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => WorkshopFormPage(
+                workshop: workshop,
+              )),
+    );
+  }
+
+  void onRemoveWorkshop() {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => ConfirmDialog(
+            onAccept: () {
+              Navigator.pop(context);
+              workshopDatabaseService.removeWorkshop(workshop.uid);
+            },
+            onDeny: () {
+              Navigator.pop(context);
+            },
+            title: 'Do you really want to remove workshop?'));
+  }
+
   return Padding(
       padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
@@ -85,7 +114,13 @@ Widget _buildWorkshopView({workshop, workshopAddress, workshopAvatar}) {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20.0),
                       )),
-                  Icon(Icons.more_horiz)
+                  GestureDetector(
+                      child: Icon(Icons.more_horiz),
+                      onTap: () => openManageModal(
+                          context: context,
+                          workshop: workshop,
+                          handleEdit: onEditWorkshop,
+                          handleRemove: onRemoveWorkshop))
                 ]),
             Row(
               children: <Widget>[
@@ -160,4 +195,27 @@ Widget _buildWorkshopView({workshop, workshopAddress, workshopAvatar}) {
                     ? WorkshopMap(coords: workshopAddress.coords!)
                     : null)
           ]));
+}
+
+openManageModal(
+    {required BuildContext context,
+    required Workshop workshop,
+    required handleEdit,
+    required handleRemove}) {
+  return showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return SlideUpManagePanel(
+          editText: 'Edit workshop',
+          removeText: 'Remove workshop',
+          handleEdit: () {
+            Navigator.pop(context);
+            handleEdit();
+          },
+          handleRemove: () {
+            Navigator.pop(context);
+            handleRemove();
+          });
+    },
+  );
 }
