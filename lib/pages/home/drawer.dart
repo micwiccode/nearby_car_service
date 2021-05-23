@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/is_avatar_defined.dart';
 import 'package:nearby_car_service/models/app_user.dart';
+import 'package:nearby_car_service/pages/home/owner/workshop_form_page.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/pages/shared/slide_up_roles_panel_content.dart';
@@ -95,8 +96,6 @@ Future<Pair<String, List<String>>> getUserRoles(List<String> userRoles) async {
     return !userRoles.contains(r);
   }).toList();
 
-  print(availableNewRoles);
-
   return Pair<String, List<String>>(role, availableNewRoles);
 }
 
@@ -124,11 +123,22 @@ buildRoleBasedTiles(BuildContext context, List<String> availableNewRoles,
   }
 }
 
-openRoleBasedModal({required BuildContext context, required List<String> roles}) {
+openRoleBasedModal(
+    {required BuildContext context, required List<String> roles}) {
+  void handleOpenWorkshopForm() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => WorkshopFormPage(
+                workshop: null,
+              )),
+    );
+  }
+
   return showModalBottomSheet(
     context: context,
     builder: (context) {
-      return SlideUpRolesPanel(roles: roles);
+      return SlideUpRolesPanel(roles: roles, onSelect: handleOpenWorkshopForm);
     },
   );
 }

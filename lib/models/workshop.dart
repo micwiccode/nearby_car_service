@@ -1,6 +1,8 @@
 import 'address.dart';
 
 class Workshop {
+  String uid;
+  String appUserUid;
   String name;
   Address? address;
   String email;
@@ -8,6 +10,8 @@ class Workshop {
   String? avatar;
 
   Workshop({
+    this.uid = '',
+    this.appUserUid = '',
     this.name = '',
     this.email = '',
     this.phoneNumber = '',

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
+import 'package:nearby_car_service/helpers/capitalize.dart';
 
 import 'button.dart';
 
 class SlideUpRolesPanel extends StatefulWidget {
   final List<String> roles;
-  const SlideUpRolesPanel({required this.roles, Key? key})
+  final Function onSelect;
+  const SlideUpRolesPanel(
+      {required this.roles, required this.onSelect, Key? key})
       : super(key: key);
 
   @override
@@ -14,14 +17,12 @@ class SlideUpRolesPanel extends StatefulWidget {
 }
 
 class _SlideUpRolesPanelState extends State<SlideUpRolesPanel> {
-  List<String> roles = [ROLES.CLIENT, ROLES.EMPLOYEE, ROLES.OWNER];
   String _selectedRole = ROLES.CLIENT;
 
   @override
   void initState() {
     super.initState();
-    _selectedRole =
-        roles.where((role) => !widget.roles.contains(role)).first;
+    _selectedRole = widget.roles.first;
   }
 
   Widget buildRadioButton(String text, String value, onChanged) {
@@ -32,28 +33,27 @@ class _SlideUpRolesPanelState extends State<SlideUpRolesPanel> {
         onChanged: (val) => onChanged(val));
   }
 
+  List<Widget> buildRadioButtons() {
+    return widget.roles
+        .map((role) => buildRadioButton(
+            capitalize(role),
+            role,
+            (value) => setState(() {
+                  _selectedRole = value;
+                })))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      buildRadioButton(
-          'Client',
-          ROLES.CLIENT,
-          (value) => setState(() {
-                _selectedRole = value;
-              })),
-      buildRadioButton(
-          'Employee',
-          ROLES.EMPLOYEE,
-          (value) => setState(() {
-                _selectedRole = value;
-              })),
-      buildRadioButton(
-          'Owner',
-          ROLES.OWNER,
-          (value) => setState(() {
-                _selectedRole = value;
-              })),
-      Button(text: 'Continue', onPressed: ()=>{})
+      ...buildRadioButtons(),
+      Button(
+          text: 'Continue',
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onSelect();
+          })
     ]);
   }
 }

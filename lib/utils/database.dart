@@ -23,6 +23,12 @@ class DatabaseService {
     return collection.doc(uid).update({'onboardingStep': step});
   }
 
+  Future addAppUserRole(String role) async {
+    return collection.doc(uid).update({
+      "roles": FieldValue.arrayUnion([role])
+    });
+  }
+
   Future<void> _setAppUser(AppUser user) {
     return collection.doc(uid).set({
       'firstName': user.firstName,

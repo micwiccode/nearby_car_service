@@ -7,5 +7,5 @@ Future<String?>? getPreferencesUserRole() async {
 
 Future<void> setPreferencesUserRole(currentRole) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setInt('CURRENT_ROLE', currentRole);
+  prefs.setString('CURRENT_ROLE', currentRole);
 }

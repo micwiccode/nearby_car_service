@@ -4,7 +4,6 @@ import 'package:nearby_car_service/helpers/enum_to_list.dart';
 import 'package:nearby_car_service/helpers/get_year_to_now.dart';
 import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
-import 'package:nearby_car_service/models/app_user_role.dart';
 import 'package:nearby_car_service/models/car.dart';
 import 'package:nearby_car_service/models/employee.dart';
 import 'package:nearby_car_service/models/workshop.dart';
@@ -426,7 +425,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
             )
           : ListTile(
               contentPadding: EdgeInsets.all(0),
-              leading: WorkshopAvatar(),
+              leading: Icon(
+                Icons.business_center_outlined,
+                color: Colors.black,
+                size: 35.0,
+              ),
               title: Text(item.name),
             ),
     );
@@ -439,21 +442,29 @@ class _OnboardingPageState extends State<OnboardingPage> {
         : "";
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 6),
-      decoration: !isSelected
-          ? null
-          : BoxDecoration(
-              border: Border.all(color: Theme.of(context).primaryColor),
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.white,
-            ),
-      child: ListTile(
-        selected: isSelected,
-        title: Text(item.name),
-        subtitle: Text(subtitle),
-        dense: true,
-        leading: WorkshopAvatar(avatar: item.avatar, size: 35.0),
-      ),
-    );
+        margin: EdgeInsets.symmetric(horizontal: 6),
+        decoration: !isSelected
+            ? null
+            : BoxDecoration(
+                border: Border.all(color: Theme.of(context).primaryColor),
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+              ),
+        child: ListTile(
+          selected: isSelected,
+          title: Text(item.name),
+          subtitle: Text(subtitle),
+          dense: true,
+          leading: item.avatar != null
+              ? Image.network(
+                  item.avatar!,
+                  height: 35.0,
+                )
+              : Icon(
+                  Icons.business_center_outlined,
+                  color: Colors.black,
+                  size: 35.0,
+                ),
+        ));
   }
 }

@@ -1,62 +1,63 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/helpers/enum_to_list.dart';
-import 'package:nearby_car_service/helpers/get_year_to_now.dart';
+import 'package:flutter/services.dart';
 import 'package:nearby_car_service/helpers/upload_image.dart';
+import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
-import 'package:nearby_car_service/models/car.dart';
+import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
-import 'package:nearby_car_service/pages/shared/car_avatar.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
-import 'package:nearby_car_service/utils/cars_database.dart';
+import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
+import 'package:nearby_car_service/pages/shared/workshop_avatar.dart';
+import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/workshop_service.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class CarFormPage extends StatefulWidget {
-  final Car? car;
-  CarFormPage({required this.car, Key? key}) : super(key: key);
+import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
+
+class WorkshopFormPage extends StatefulWidget {
+  final Workshop? workshop;
+  WorkshopFormPage({required this.workshop, Key? key}) : super(key: key);
 
   @override
-  _CarFormPageState createState() => _CarFormPageState();
+  _WorkshopFormPageState createState() => _WorkshopFormPageState();
 }
 
-class _CarFormPageState extends State<CarFormPage> {
+class _WorkshopFormPageState extends State<WorkshopFormPage> {
   String error = '';
   bool _isLoading = false;
   String _avatar = '';
-  int? _productionYear;
-  String _fuelType = 'Petrol';
-  TextEditingController _markController = TextEditingController(text: '');
-  TextEditingController _modelController = TextEditingController(text: '');
+  TextEditingController _nameController = TextEditingController(text: '');
+  TextEditingController _phoneNumberController =
+      TextEditingController(text: '');
+  TextEditingController _emailController = TextEditingController(text: '');
+  TextEditingController _zipCodeController = TextEditingController(text: '');
+  TextEditingController _cityController = TextEditingController(text: '');
+  TextEditingController _streetController = TextEditingController(text: '');
+  TextEditingController _streetNumberController =
+      TextEditingController(text: '');
 
   @override
   void initState() {
     super.initState();
-    if (widget.car != null) {
-      _avatar = widget.car!.avatar;
-      _productionYear = widget.car!.productionYear;
-      _fuelType = widget.car!.fuelType;
-      _markController.text = widget.car!.mark;
-      _modelController.text = widget.car!.model;
+    if (widget.workshop != null) {
+      _avatar = widget.workshop!.avatar!;
+      _nameController.text = widget.workshop!.name;
+      _emailController.text = widget.workshop!.email;
+      _phoneNumberController.text = widget.workshop!.phoneNumber;
+      _zipCodeController.text = widget.workshop!.address!.zipCode;
+      _cityController.text = widget.workshop!.address!.city;
+      _streetController.text = widget.workshop!.address!.street;
+      _streetNumberController.text = widget.workshop!.address!.streetNumber;
     }
   }
 
-  late CarDatabaseService carDatabaseService;
-  final GlobalKey<FormState> _carFormFormFormKey = GlobalKey<FormState>();
+  late WorkshopDatabaseService workshopDatabaseService;
+  late DatabaseService databaseService;
+  final GlobalKey<FormState> _workshopFormFormFormKey = GlobalKey<FormState>();
 
-  void changeCarProductionYear(productionYear) {
-    setState(() {
-      _productionYear = productionYear;
-    });
-  }
-
-  void changeCarFuelType(fuelType) {
-    setState(() {
-      _fuelType = fuelType;
-    });
-  }
-
-  void changeCarAvatar(avatar) {
+  void changeWorkshopAvatar(avatar) {
     setState(() {
       _avatar = avatar;
     });
@@ -64,33 +65,43 @@ class _CarFormPageState extends State<CarFormPage> {
 
   Widget formInner(String appUserUid) {
     bool isValidStep() {
-      return _carFormFormFormKey.currentState!.validate();
+      return _workshopFormFormFormKey.currentState!.validate();
     }
 
-    Future<void> handleUpdateCarForm() async {
+    Future<void> handleUpdateWorkshopForm() async {
       if (isValidStep()) {
         setState(() => _isLoading = true);
         String? avatarUrl =
-            await uploadImage(_avatar, 'cars/$appUserUid/${Uuid().v1()}');
+            await uploadImage(_avatar, 'workshops/$appUserUid/${Uuid().v1()}');
 
         if (avatarUrl != null) {
           _avatar = avatarUrl;
         }
 
-        Car car = Car(
-          mark: _markController.text,
-          model: _modelController.text,
-          productionYear: _productionYear,
-          fuelType: _fuelType,
+        Address address = Address(
+          street: _streetController.text,
+          streetNumber: _streetNumberController.text,
+          city: _cityController.text,
+          zipCode: _cityController.text,
+        );
+
+        Workshop workshop = Workshop(
+          name: _nameController.text,
+          email: _emailController.text,
+          phoneNumber: _phoneNumberController.text,
+          address: address,
           avatar: _avatar,
         );
 
-        if (widget.car != null) {
-          car.uid = widget.car!.uid;
-          await carDatabaseService.updateCar(car);
+        if (widget.workshop != null) {
+          workshop.uid = widget.workshop!.uid;
+          await workshopDatabaseService.updateWorkshop(workshop);
         } else {
-          await carDatabaseService.createCar(car);
+          await workshopDatabaseService.createWorkshop(workshop);
+          await databaseService.addAppUserRole(ROLES.OWNER);
         }
+
+        await setPreferencesUserRole(ROLES.OWNER);
         Navigator.of(context).pop();
         setState(() => _isLoading = false);
       }
@@ -102,26 +113,52 @@ class _CarFormPageState extends State<CarFormPage> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              CarAvatar(_avatar, changeCarAvatar),
-              buildTextField('Car mark', _markController),
-              buildTextField('Car model', _modelController),
-              buildDropdown('Fuel', _fuelType, enumToList(FuelType.values),
-                  changeCarFuelType),
-              buildDropdown('Production year', _productionYear,
-                  getYearsToNow(1950), changeCarProductionYear),
+              WorkshopAvatar(_avatar, changeWorkshopAvatar),
+              buildTextField('Workshop name', _nameController),
+              Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Workshop contact',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  )),
+              buildTextField('Email', _emailController),
+              buildTextField(
+                'Phone number',
+                _phoneNumberController,
+                onlyDigits: true,
+              ),
+              Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Workshop address',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  )),
+              buildTextField('Street', _streetController),
+              buildTextField(
+                'Street Number',
+                _streetNumberController,
+                numberKeyboardType: true,
+              ),
+              buildTextField(
+                'Zip code',
+                _zipCodeController,
+                numberKeyboardType: true,
+              ),
+              buildTextField('City', _cityController),
               ErrorMessage(error: error),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Button(
                       text: 'Save',
-                      onPressed: handleUpdateCarForm,
+                      onPressed: handleUpdateWorkshopForm,
                       isLoading: _isLoading)),
             ]),
       ),
     );
   }
 
-  Widget buildTextField(String text, controller) {
+  Widget buildTextField(String text, controller,
+      {bool? onlyDigits, bool? numberKeyboardType}) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: TextFormField(
@@ -132,6 +169,13 @@ class _CarFormPageState extends State<CarFormPage> {
           }
           return null;
         },
+        inputFormatters: onlyDigits != null && onlyDigits
+            ? <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly]
+            : [],
+        keyboardType: (onlyDigits != null && onlyDigits) ||
+                (numberKeyboardType != null && numberKeyboardType)
+            ? TextInputType.number
+            : TextInputType.text,
         decoration: InputDecoration(
           labelText: text,
           enabledBorder: OutlineInputBorder(
@@ -156,28 +200,20 @@ class _CarFormPageState extends State<CarFormPage> {
     );
   }
 
-  Widget buildDropdown(String label, selectedItem, items, onChanged) {
-    return Padding(
-        padding: EdgeInsets.all(10.0),
-        child: DropdownSearch(
-            label: label,
-            items: items,
-            selectedItem: selectedItem,
-            validator: (v) => v == null ? "This field is required" : null,
-            showClearButton: true,
-            onChanged: onChanged));
-  }
-
   @override
   Widget build(BuildContext context) {
     final appUser = Provider.of<AppUser?>(context);
-    carDatabaseService = CarDatabaseService(
-      appUserUid: appUser!.uid,
+    databaseService = DatabaseService(
+      uid: appUser!.uid,
+    );
+    workshopDatabaseService = WorkshopDatabaseService(
+      appUserUid: appUser.uid,
     );
 
     return Scaffold(
       appBar: AppBar(
-          title: Text(widget.car == null ? 'Add new car' : 'Edit car'),
+          title: Text(
+              widget.workshop == null ? 'Add new workshop' : 'Edit workshop'),
           leading: BackButton(color: Colors.black),
           backgroundColor: Colors.amber,
           elevation: 0.0,
@@ -187,7 +223,8 @@ class _CarFormPageState extends State<CarFormPage> {
             ),
           )),
       body: Center(
-        child: Form(key: _carFormFormFormKey, child: formInner(appUser.uid)),
+        child:
+            Form(key: _workshopFormFormFormKey, child: formInner(appUser.uid)),
       ),
     );
   }
