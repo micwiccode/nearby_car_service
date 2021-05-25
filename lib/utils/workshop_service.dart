@@ -3,8 +3,6 @@ import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/coords.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 
-import 'location_service.dart';
-
 class WorkshopDatabaseService {
   final String appUserUid;
   WorkshopDatabaseService({required this.appUserUid});

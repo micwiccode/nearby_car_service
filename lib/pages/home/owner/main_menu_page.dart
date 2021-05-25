@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
+import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/home/owner/workshop_menu_page.dart';
+import 'package:nearby_car_service/pages/home/owner/services_menu_page.dart';
+import 'package:nearby_car_service/utils/workshop_service.dart';
+import 'package:provider/provider.dart';
 
 class MainMenuPage extends StatefulWidget {
-  final AppUser user;
-  const MainMenuPage({required this.user, Key? key}) : super(key: key);
+  const MainMenuPage({Key? key}) : super(key: key);
 
   @override
   _MainMenuPageState createState() => _MainMenuPageState();
@@ -17,10 +20,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     WorkshopMenuPage(),
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
+    SerivcesMenuPage(),
     Text(
       'Index 0: Home',
       style: optionStyle,
@@ -35,10 +35,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appUser = Provider.of<AppUser?>(context);
+
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: StreamProvider<Workshop?>.value(
+          initialData: null,
+          value: WorkshopDatabaseService(appUserUid: appUser!.uid).myWorkshop,
+          child: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          )),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -46,7 +51,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
             label: 'My workshop',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car),
+            icon: Icon(Icons.home_repair_service),
             label: 'Services',
           ),
           BottomNavigationBarItem(

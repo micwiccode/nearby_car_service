@@ -11,6 +11,7 @@ import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/pages/shared/workshop_avatar.dart';
 import 'package:nearby_car_service/utils/database.dart';
 import 'package:nearby_car_service/utils/workshop_service.dart';
+import 'package:nearby_car_service/utils/services_service.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -53,6 +54,7 @@ class _WorkshopFormPageState extends State<WorkshopFormPage> {
     }
   }
 
+  late ServicesDatabaseService servicesDatabaseService;
   late WorkshopDatabaseService workshopDatabaseService;
   late DatabaseService databaseService;
   final GlobalKey<FormState> _workshopFormFormFormKey = GlobalKey<FormState>();
@@ -97,8 +99,12 @@ class _WorkshopFormPageState extends State<WorkshopFormPage> {
           workshop.uid = widget.workshop!.uid;
           await workshopDatabaseService.updateWorkshop(workshop);
         } else {
-          await workshopDatabaseService.createWorkshop(workshop);
-          await databaseService.addAppUserRole(ROLES.OWNER);
+          Workshop savedWorkshop =
+              await workshopDatabaseService.createWorkshop(workshop);
+          servicesDatabaseService =
+              ServicesDatabaseService(workshopUid: savedWorkshop.uid);
+          await servicesDatabaseService.addDefaultServices();
+          await await databaseService.addAppUserRole(ROLES.OWNER);
         }
 
         await setPreferencesUserRole(ROLES.OWNER);

@@ -41,7 +41,7 @@ class _RoleBasedPageState extends State<RoleBasedPage> {
       case ROLES.CLIENT:
         return ClientMainMenuPage.MainMenuPage(user: widget.user);
       case ROLES.OWNER:
-        return OwnertMainMenuPage.MainMenuPage(user: widget.user);
+        return OwnertMainMenuPage.MainMenuPage();
       // case ROLES.EMPLOYEE:
       //   return MainMenuPage(user: widget.user);
       default:

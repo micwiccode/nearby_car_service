@@ -47,6 +47,8 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
   modal_bottom_sheet: ^2.0.0
   geocoding: ^2.0.0
+  flutter_masked_text: ^0.8.0
+  extended_masked_text: ^2.2.1
 
 dev_dependencies:
   flutter_test:

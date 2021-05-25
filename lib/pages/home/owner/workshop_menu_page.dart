@@ -29,7 +29,7 @@ class _WorkshopMenuPageState extends State<WorkshopMenuPage> {
     );
 
     return StreamBuilder<Workshop>(
-      stream: WorkshopDatabaseService(appUserUid: appUser!.uid).myWorkshop,
+      stream: WorkshopDatabaseService(appUserUid: appUser.uid).myWorkshop,
       builder: (BuildContext context, snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong');
