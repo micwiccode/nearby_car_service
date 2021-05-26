@@ -4,11 +4,21 @@ import 'package:nearby_car_service/models/app_user.dart';
 class DatabaseService {
   final String uid;
   DatabaseService({required this.uid});
-  final CollectionReference collection =
+  static final CollectionReference collection =
       FirebaseFirestore.instance.collection('appUsers');
 
   Future createAppUser(AppUser user) async {
     return await _setAppUser(user);
+  }
+
+  static Future<AppUser?> getAppUserWithEmail(String email) async {
+    return await collection
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get()
+        .then((doc) {
+      return doc.docs.map(_appUserFromSnapshot).toList()[0];
+    });
   }
 
   Future updateAppUser(AppUser user) async {
@@ -33,6 +43,7 @@ class DatabaseService {
     return collection.doc(uid).set({
       'firstName': user.firstName,
       'lastName': user.lastName,
+      'email': user.email,
       'phoneNumber': user.phoneNumber,
       'roles': user.roles,
       'avatar': user.avatar,
@@ -44,11 +55,12 @@ class DatabaseService {
     return collection.doc(uid).snapshots().map(_appUserFromSnapshot);
   }
 
-  AppUser _appUserFromSnapshot(DocumentSnapshot snapshot) {
+  static AppUser _appUserFromSnapshot(DocumentSnapshot snapshot) {
     return AppUser(
-      uid: uid,
+      uid: snapshot.id,
       firstName: snapshot.data()!['firstName'] ?? '',
       lastName: snapshot.data()!['lastName'] ?? '',
+      email: snapshot.data()!['email'] ?? '',
       phoneNumber: snapshot.data()!['phoneNumber'] ?? '',
       roles: snapshot.data()!['roles'].cast<String>() ?? [],
       avatar: snapshot.data()!['avatar'] ?? '',

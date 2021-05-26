@@ -33,7 +33,9 @@ class AuthService {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      DatabaseService(uid: user!.uid);
+      String uid = user!.uid;
+      AppUser appUser = AppUser(uid: uid, email: email);
+      await DatabaseService(uid: uid).createAppUser(appUser);
       return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
@@ -46,6 +48,9 @@ class AuthService {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
+      String uid = user!.uid;
+      AppUser appUser = AppUser(uid: uid, email: email);
+      await DatabaseService(uid: uid).createAppUser(appUser);
       return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());

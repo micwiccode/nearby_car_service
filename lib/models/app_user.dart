@@ -2,6 +2,7 @@ class AppUser {
   final String uid;
   String? firstName;
   String? lastName;
+  String? email;
   String? phoneNumber;
   List<String>? roles;
   String? avatar;
@@ -11,6 +12,7 @@ class AppUser {
     required this.uid,
     this.firstName = '',
     this.lastName = '',
+    this.email = '',
     this.phoneNumber = '',
     this.roles,
     this.avatar,

@@ -1,13 +1,24 @@
-import 'workshop.dart';
+import 'app_user.dart';
 
 enum EmployeePositions { coowner, mechanic, mechanicMaster, mechanicAssistant }
 
 class Employee {
-  List<Workshop>? workshops;
+  String uid;
+  String workshopUid;
+  String appUserUid;
+  AppUser? appUser;
   String position;
+  bool isConfirmed;
 
-  Employee({this.position = '', this.workshops});
+  Employee(
+      {this.uid = '',
+      this.workshopUid = '',
+      this.appUserUid = '',
+      this.appUser,
+      this.position = '',
+      this.isConfirmed = false});
 
   @override
-  String toString() => "$workshops, $position";
+  String toString() =>
+      "$uid, $appUserUid, $workshopUid, $appUser, $isConfirmed,  $position";
 }

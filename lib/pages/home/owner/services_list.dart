@@ -25,7 +25,6 @@ class _ServicesListState extends State<ServicesList> {
     return service.isActive;
   }
 
-
   void openServiceForm(Service? service) {
     Navigator.push(
       context,
@@ -45,7 +44,7 @@ class _ServicesListState extends State<ServicesList> {
         trailing: _isEditable ? Icon(Icons.more_horiz, size: 20.0) : null,
         leading: isServiceActive
             ? Icon(
-                Icons.add_circle,
+                Icons.check_circle_outlined,
                 color: Colors.amber[600],
               )
             : Icon(

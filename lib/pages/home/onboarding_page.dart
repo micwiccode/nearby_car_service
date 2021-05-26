@@ -141,7 +141,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     Future<void> saveStepState() async {
       if (_step == 1) {
-        await databaseService.createAppUser(_user);
+        await databaseService.updateAppUser(_user);
       } else if (_step == 2) {
         await databaseService.updateAppUserRole(_user.roles ?? [ROLES.CLIENT]);
       } else {
