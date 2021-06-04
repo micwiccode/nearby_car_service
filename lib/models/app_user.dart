@@ -21,5 +21,5 @@ class AppUser {
 
   @override
   String toString() =>
-      "$firstName, $lastName, $phoneNumber, $roles, $avatar, $onboardingStep";
+      "$uid, $firstName, $lastName, $phoneNumber, $roles, $avatar, $onboardingStep";
 }

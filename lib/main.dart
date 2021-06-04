@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +9,10 @@ import 'pages/main_wrapper.dart';
 import 'pages/shared/error_message.dart';
 import 'pages/shared/loading_spinner.dart';
 import 'utils/auth_service.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
+}
 
 void main() {
   runApp(MyApp());
@@ -29,6 +33,8 @@ class MyApp extends StatelessWidget {
           }
 
           if (snapshot.connectionState == ConnectionState.done) {
+            FirebaseMessaging.onBackgroundMessage(
+                _firebaseMessagingBackgroundHandler);
             return _buildApp();
           }
 

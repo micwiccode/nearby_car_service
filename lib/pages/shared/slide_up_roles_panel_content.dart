@@ -46,14 +46,17 @@ class _SlideUpRolesPanelState extends State<SlideUpRolesPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: <Widget>[
-      ...buildRadioButtons(),
-      Button(
-          text: 'Continue',
-          onPressed: () {
-            Navigator.pop(context);
-            widget.onSelect();
-          })
-    ]);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+      child: Column(children: <Widget>[
+        ...buildRadioButtons(),
+        Button(
+            text: 'Continue',
+            onPressed: () {
+              Navigator.pop(context);
+              widget.onSelect(_selectedRole);
+            })
+      ]),
+    );
   }
 }

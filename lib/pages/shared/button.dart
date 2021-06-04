@@ -5,9 +5,9 @@ import 'loading_spinner.dart';
 class Button extends StatelessWidget {
   final Function onPressed;
   final String text;
-  final isLoading = false;
+  final bool isLoading;
 
-  Button({required this.onPressed, required this.text, isLoading});
+  Button({required this.onPressed, required this.text, this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class Button extends StatelessWidget {
         ),
       ),
       child: isLoading
-          ? LoadingSpinner()
+          ? LoadingSpinner(isButtonLoading: true)
           : Text(
               text,
               style: TextStyle(color: Colors.black),

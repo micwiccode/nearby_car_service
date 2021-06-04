@@ -25,8 +25,9 @@ class _RoleBasedPageState extends State<RoleBasedPage> {
   }
 
   _loadUserRole() async {
+    print(widget.user);
     List<String> appUserRoles = widget.user.roles!;
-    String? prefsRole = await getPreferencesUserRole();
+    String? prefsRole = await getPreferencesUserRole(widget.user.uid);
     String newRole = prefsRole != null && appUserRoles.contains(prefsRole)
         ? prefsRole
         : appUserRoles.first;

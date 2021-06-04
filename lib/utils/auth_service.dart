@@ -5,12 +5,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 
 import 'database.dart';
+import 'notifications_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   AppUser? _userFromFirebase(User? user) {
-    return user != null ? AppUser(uid: user.uid) : null;
+    return user != null ? AppUser(uid: user.uid, email: user.email) : null;
   }
 
   Stream<AppUser?> get user {
@@ -36,6 +37,7 @@ class AuthService {
       String uid = user!.uid;
       AppUser appUser = AppUser(uid: uid, email: email);
       await DatabaseService(uid: uid).createAppUser(appUser);
+      await getAndSaveUserToken(user.uid);
       return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
@@ -51,6 +53,7 @@ class AuthService {
       String uid = user!.uid;
       AppUser appUser = AppUser(uid: uid, email: email);
       await DatabaseService(uid: uid).createAppUser(appUser);
+      await getAndSaveUserToken(user.uid);
       return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
@@ -92,7 +95,14 @@ class AuthService {
       }
     }
 
+    await getAndSaveUserToken(user!.uid);
+
     return _userFromFirebase(user);
+  }
+
+  Future<void> getAndSaveUserToken(String appUserUid) async {
+    NotificationsService notificationService = NotificationsService();
+    await notificationService.getAndSaveToken(appUserUid);
   }
 
   Future<void> signOut({required BuildContext context}) async {

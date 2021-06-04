@@ -6,7 +6,7 @@ import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
 
 import 'drawer.dart';
-import 'onboarding_page.dart';
+import 'onboarding/onboarding_page.dart';
 import 'profile_page.dart';
 import 'role_based_page.dart';
 
@@ -31,22 +31,31 @@ class Home extends StatelessWidget {
             return LoadingSpinner();
           }
 
-          if (snapshot.data == null || snapshot.data!.onboardingStep! < 4) {
+          AppUser? user = snapshot.data;
+
+          if (user == null || user.onboardingStep! < 4) {
             return Scaffold(
                 appBar: AppBar(
                   title: const Text('Nearby car service'),
                   backgroundColor: Colors.amber,
                   elevation: 0.0,
+                  actions: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.logout,
+                        color: Colors.black,
+                      ),
+                      onPressed: handleSignOut,
+                    )
+                  ],
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(
                       bottom: Radius.circular(10),
                     ),
                   ),
                 ),
-                body: OnboardingPage(user: snapshot.data));
+                body: OnboardingPage(user: user));
           }
-
-          AppUser user = snapshot.data!;
 
           void handleOpenProfilePage() {
             Navigator.push(

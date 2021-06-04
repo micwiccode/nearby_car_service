@@ -1,19 +1,14 @@
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:extended_masked_text/extended_masked_text.dart';
 import 'package:flutter/material.dart';
-import 'package:nearby_car_employee/models/employee.dart';
-import 'package:nearby_car_employee/models/employee.dart';
-import 'package:nearby_car_employee/models/workshop.dart';
-import 'package:nearby_car_employee/pages/shared/button.dart';
-import 'package:nearby_car_employee/pages/shared/_error_message.dart';
-import 'package:nearby_car_employee/pages/shared/price_input.dart';
-import 'package:nearby_car_employee/utils/employees_employee.dart';
-import 'package:nearby_car_service/helpers/enum_to_list.dart';
+import 'package:nearby_car_service/helpers/capitalize.dart';
+import 'package:nearby_car_service/helpers/is_email_valid.dart';
 import 'package:nearby_car_service/models/employee.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
+import 'package:nearby_car_service/pages/shared/text_form_field.dart';
 import 'package:nearby_car_service/utils/employees_service.dart';
-import 'package:provider/provider.dart';
+
+import 'package:nearby_car_service/consts/employee_positions.dart' as POSITIONS;
 
 class EmployeeFormPage extends StatefulWidget {
   final Employee? employee;
@@ -31,6 +26,12 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
   bool _isLoading = false;
   String _position = '';
   TextEditingController _emailController = TextEditingController(text: '');
+  late EmployeesDatabaseService employeesDatabaseEmployee;
+  final GlobalKey<FormState> _employeeFormFormFormKey = GlobalKey<FormState>();
+
+  void setEmployeePosition(postion) {
+    _position = postion;
+  }
 
   @override
   void initState() {
@@ -40,52 +41,61 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
     }
   }
 
-  late EmployeesDatabaseService employeesDatabaseEmployee;
-  final GlobalKey<FormState> _employeeFormFormFormKey = GlobalKey<FormState>();
+  bool isValidStep() {
+    return _employeeFormFormFormKey.currentState!.validate();
+  }
 
-  void setEmployeePosition(postion) {
-    _position = postion;
+  Future<void> handleUpdateEmployee() async {
+    if (isValidStep()) {
+      setState(() => _isLoading = true);
+
+      if (widget.employee != null) {
+        String employeeUid = widget.employee!.uid;
+        await employeesDatabaseEmployee.updateEmployeePosition(
+            employeeUid: employeeUid, position: _position);
+      } else {
+        try {
+          await employeesDatabaseEmployee.inviteEmployeeToWorkshop(
+              email: _emailController.text.trim(), position: _position);
+
+          Navigator.of(context).pop();
+        } catch (err) {
+          setState(() => _error = err.toString());
+        }
+      }
+
+      setState(() => _isLoading = false);
+    }
   }
 
   Widget formInner() {
-    bool isValidStep() {
-      return _employeeFormFormFormKey.currentState!.validate();
-    }
-
-    Future<void> handleUpdateEmployee() async {
-      if (isValidStep()) {
-        setState(() {
-          _isLoading = true;
-        });
-
-        if (widget.employee != null) {
-          String employeeUid = widget.employee!.uid;
-          await employeesDatabaseEmployee.updateEmployeePosition(
-              employeeUid: employeeUid, position: _position);
-        } else {
-          await employeesDatabaseEmployee.inviteEmployeeToWorkshop(
-              email: _emailController.text, position: _position);
-        }
-        Navigator.of(context).pop();
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-
     return Container(
       margin: new EdgeInsets.all(25.0),
       child: SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              buildDropdown('Position', _position,
-                  enumToList(EmployeePositions.values), setEmployeePosition),
+              if (widget.employee == null)
+                TextFormFieldWidget(
+                  labelText: 'Employee account email',
+                  controller: _emailController,
+                  functionValidate: () {
+                    if (!isEmailValid(_emailController.text.trim())) {
+                      return 'Please enter valid email';
+                    }
+                    return null;
+                  },
+                ),
+              _buildDropdown(
+                  'Position',
+                  _position,
+                  POSITIONS.POSITIONS.map((s) => capitalize(s)).toList(),
+                  setEmployeePosition),
               ErrorMessage(error: _error),
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Button(
-                      text: 'Save',
+                      text: 'Add',
                       onPressed: handleUpdateEmployee,
                       isLoading: _isLoading)),
             ]),
@@ -93,14 +103,13 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
     );
   }
 
-  Widget buildDropdown(String label, selectedItem, items, onChanged) {
+  Widget _buildDropdown(String label, selectedItem, items, onChanged) {
     return Padding(
         padding: EdgeInsets.all(10.0),
         child: DropdownSearch(
             label: label,
             items: items,
             validator: (v) => v == null ? "This field is required" : null,
-            hint: "Select a country",
             showClearButton: true,
             onChanged: onChanged));
   }

@@ -20,7 +20,7 @@ class Workshop {
   });
 
   String workshopAsString() {
-    return '#$name $email';
+    return '$name $email';
   }
 
   bool userFilterByName(String filter) {

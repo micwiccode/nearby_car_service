@@ -18,9 +18,10 @@ class _PendingEmployeesMenuPageState extends State<PendingEmployeesMenuPage> {
   @override
   Widget build(BuildContext context) {
     final workshop = Provider.of<Workshop?>(context);
+    final String noDataText = 'No pending invitations employees';
 
     if (workshop == null) {
-      return Text('No pending employees');
+      return Text(noDataText);
     }
 
     return StreamBuilder<List<Employee>>(
@@ -36,6 +37,7 @@ class _PendingEmployeesMenuPageState extends State<PendingEmployeesMenuPage> {
         }
 
         return EmployeesList(
+            noDataText: noDataText,
             employees: snapshot.data == null ? [] : snapshot.data!,
             workshopUid: workshop.uid);
       },

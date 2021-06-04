@@ -17,7 +17,8 @@ class DatabaseService {
         .limit(1)
         .get()
         .then((doc) {
-      return doc.docs.map(_appUserFromSnapshot).toList()[0];
+      List<AppUser> appUsers = doc.docs.map(_appUserFromSnapshot).toList();
+      return appUsers.length > 0 ? appUsers[0] : null;
     });
   }
 

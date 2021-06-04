@@ -28,8 +28,8 @@ class WorkshopAvatar extends StatelessWidget {
     return Stack(children: [
       (avatar.contains('/storage')
           ? Container(
-              width: 100,
-              height: 100,
+              width: 75,
+              height: 75,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -40,8 +40,8 @@ class WorkshopAvatar extends StatelessWidget {
           : CachedNetworkImage(
               imageUrl: avatar,
               imageBuilder: (context, imageProvider) => Container(
-                width: 100,
-                height: 100,
+                width: 75,
+                height: 75,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -73,7 +73,7 @@ class WorkshopAvatar extends StatelessWidget {
       Icon(
         Icons.business_outlined,
         color: Colors.black,
-        size: 100.0,
+        size: 75.0,
       ),
       Positioned(
         bottom: -5.0,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/workshop.dart';
+import 'package:nearby_car_service/pages/home/owner/employees_menu_page.dart';
 import 'package:nearby_car_service/pages/home/owner/workshop_menu_page.dart';
 import 'package:nearby_car_service/pages/home/owner/services_menu_page.dart';
 import 'package:nearby_car_service/utils/workshop_service.dart';
@@ -15,16 +16,11 @@ class MainMenuPage extends StatefulWidget {
 
 class _MainMenuPageState extends State<MainMenuPage> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   static const List<Widget> _widgetOptions = <Widget>[
     WorkshopMenuPage(),
     SerivcesMenuPage(),
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
+    EmployeesMenuPage()
   ];
 
   void _onItemTapped(int index) {

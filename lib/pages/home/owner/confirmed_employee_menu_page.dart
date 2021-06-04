@@ -19,9 +19,10 @@ class _ConfirmedEmployeesMenuPageState
   @override
   Widget build(BuildContext context) {
     final workshop = Provider.of<Workshop?>(context);
+    final String noDataText = 'No active employees';
 
     if (workshop == null) {
-      return Text('No employees');
+      return Text(noDataText);
     }
 
     return StreamBuilder<List<Employee>>(
@@ -37,6 +38,7 @@ class _ConfirmedEmployeesMenuPageState
         }
 
         return EmployeesList(
+            noDataText: noDataText,
             employees: snapshot.data == null ? [] : snapshot.data!,
             workshopUid: workshop.uid);
       },

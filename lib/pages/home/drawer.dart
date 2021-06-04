@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/is_avatar_defined.dart';
 import 'package:nearby_car_service/models/app_user.dart';
-import 'package:nearby_car_service/pages/home/owner/workshop_form_page.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/pages/shared/slide_up_roles_panel_content.dart';
@@ -31,7 +30,7 @@ class CustomDrawer extends StatelessWidget {
     String drawerUserName = '${user.firstName!} ${user.lastName!}';
 
     return FutureBuilder<Pair<String, List<String>>>(
-        future: getUserRoles(user.roles!),
+        future: getUserRoles(user.roles!, user.uid),
         builder: (BuildContext context,
             AsyncSnapshot<Pair<String, List<String>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -45,7 +44,7 @@ class CustomDrawer extends StatelessWidget {
                 '${role[0].toUpperCase()}${role.substring(1).toLowerCase()}';
 
             Widget roleBasedTiles =
-                buildRoleBasedTiles(context, availableNewRoles, user.roles!);
+                buildRoleBasedTiles(context, availableNewRoles, user.roles!, user.uid);
 
             return Drawer(
                 child: ListView(children: [
@@ -86,8 +85,8 @@ class CustomDrawer extends StatelessWidget {
   }
 }
 
-Future<Pair<String, List<String>>> getUserRoles(List<String> userRoles) async {
-  String? prefsRole = await getPreferencesUserRole();
+Future<Pair<String, List<String>>> getUserRoles(List<String> userRoles, String userUid) async {
+  String? prefsRole = await getPreferencesUserRole(userUid);
   String role = prefsRole != null && userRoles.contains(prefsRole)
       ? prefsRole
       : userRoles.first;
@@ -100,21 +99,30 @@ Future<Pair<String, List<String>>> getUserRoles(List<String> userRoles) async {
 }
 
 buildRoleBasedTiles(BuildContext context, List<String> availableNewRoles,
-    List<String> userRoles) {
+    List<String> userRoles, String userUid) {
   Widget createNewRoleTile = ListTile(
       title: Text('Create new user role profile'),
       leading: Icon(Icons.person_rounded),
-      onTap: () =>
-          openRoleBasedModal(context: context, roles: availableNewRoles));
+      onTap: () => openRoleBasedModal(
+          context: context,
+          roles: availableNewRoles,
+          onSelect: (selectedRole) {
+            setPreferencesUserRole(selectedRole, userUid);
+          }));
 
   Widget changeRoleTile = ListTile(
       title: Text('Change current role profile'),
       leading: Icon(Icons.person_rounded),
-      onTap: () => openRoleBasedModal(context: context, roles: userRoles));
+      onTap: () => openRoleBasedModal(
+          context: context,
+          roles: userRoles,
+          onSelect: (selectedRole) {
+            setPreferencesUserRole(selectedRole, userUid);
+          }));
 
   if (userRoles.length < 3) {
     if (availableNewRoles.length > 0) {
-      return createNewRoleTile;
+      return changeRoleTile;
     } else {
       return [changeRoleTile, createNewRoleTile];
     }
@@ -123,22 +131,27 @@ buildRoleBasedTiles(BuildContext context, List<String> availableNewRoles,
   }
 }
 
-openRoleBasedModal(
-    {required BuildContext context, required List<String> roles}) {
-  void handleOpenWorkshopForm() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => WorkshopFormPage(
-                workshop: null,
-              )),
-    );
-  }
+// void handleOpenWorkshopForm(selectedRole) {
+//   Navigator.push(
+//     context,
+//     MaterialPageRoute(
+//         builder: (context) => WorkshopFormPage(
+//               workshop: null,
+//             )),
+//   );
+// }
 
+openRoleBasedModal(
+    {required BuildContext context,
+    required List<String> roles,
+    required Function onSelect}) {
   return showModalBottomSheet(
+    isScrollControlled: true,
     context: context,
     builder: (context) {
-      return SlideUpRolesPanel(roles: roles, onSelect: handleOpenWorkshopForm);
+      return Wrap(children: <Widget>[
+        SlideUpRolesPanel(roles: roles, onSelect: onSelect)
+      ]);
     },
   );
 }

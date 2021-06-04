@@ -16,7 +16,7 @@ class UserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(8.0),
         child: GestureDetector(
             onTap: () => pickImage(onImageChange),
             child: isAvatarDefined(avatar)
@@ -28,8 +28,8 @@ class UserAvatar extends StatelessWidget {
     return Stack(children: [
       (avatar.contains('/storage')
           ? Container(
-              width: 100,
-              height: 100,
+              width: 75,
+              height: 75,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -40,8 +40,8 @@ class UserAvatar extends StatelessWidget {
           : CachedNetworkImage(
               imageUrl: avatar,
               imageBuilder: (context, imageProvider) => Container(
-                width: 100,
-                height: 100,
+                width: 75,
+                height: 75,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -73,7 +73,7 @@ class UserAvatar extends StatelessWidget {
       Icon(
         Icons.account_circle,
         color: Colors.black,
-        size: 100.0,
+        size: 75.0,
       ),
       Positioned(
         bottom: -5.0,

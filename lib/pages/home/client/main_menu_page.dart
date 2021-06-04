@@ -22,7 +22,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       style: optionStyle,
     ),
     CarsMenuPage(),
-    WorkshopsMap(),
+    // WorkshopsMap(),
   ];
 
   void _onItemTapped(int index) {

@@ -1,7 +1,5 @@
 import 'app_user.dart';
 
-enum EmployeePositions { coowner, mechanic, mechanicMaster, mechanicAssistant }
-
 class Employee {
   String uid;
   String workshopUid;
@@ -9,6 +7,8 @@ class Employee {
   AppUser? appUser;
   String position;
   bool isConfirmed;
+  bool isConfirmedByOwner;
+  bool isConfirmedByEmployee;
 
   Employee(
       {this.uid = '',
@@ -16,9 +16,11 @@ class Employee {
       this.appUserUid = '',
       this.appUser,
       this.position = '',
-      this.isConfirmed = false});
+      this.isConfirmed = false,
+      this.isConfirmedByOwner = false,
+      this.isConfirmedByEmployee = false});
 
   @override
   String toString() =>
-      "$uid, $appUserUid, $workshopUid, $appUser, $isConfirmed,  $position";
+      "$uid, $appUserUid, $workshopUid, $appUser, $isConfirmed, $isConfirmedByOwner, $isConfirmedByEmployee, $position";
 }

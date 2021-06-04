@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/models/employee.dart';
-import 'package:nearby_car_service/models/workshop.dart';
-import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
-import 'package:nearby_car_service/pages/home/owner/employees_list.dart';
-import 'package:nearby_car_service/utils/employees_service.dart';
-import 'package:provider/provider.dart';
+import 'package:nearby_car_service/pages/home/owner/pending_employee_menu_page.dart';
+import 'confirmed_employee_menu_page.dart';
 
 class EmployeesMenuPage extends StatefulWidget {
   const EmployeesMenuPage({Key? key}) : super(key: key);
@@ -13,31 +9,42 @@ class EmployeesMenuPage extends StatefulWidget {
   _EmployeesMenuPageState createState() => _EmployeesMenuPageState();
 }
 
-class _EmployeesMenuPageState extends State<EmployeesMenuPage> {
+class _EmployeesMenuPageState extends State<EmployeesMenuPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = new TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final workshop = Provider.of<Workshop?>(context);
-
-    if (workshop == null) {
-      return Text('No employees');
-    }
-
-    return StreamBuilder<List<Employee>>(
-      stream: EmployeesDatabaseService(workshopUid: workshop.uid)
-          .myWorkshopEmployees,
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Something went wrong');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return LoadingSpinner();
-        }
-
-        return EmployeesList(
-            employees: snapshot.data == null ? [] : snapshot.data!,
-            workshopUid: workshop.uid);
-      },
-    );
+    return Column(children: <Widget>[
+      Container(
+          child: TabBar(
+        indicatorColor: Colors.amber[600],
+        controller: _tabController,
+        tabs: [
+          Tab(child: Text('Active employees')),
+          Tab(child: Text('Pending invitations'))
+        ],
+      )),
+      Expanded(
+          child: TabBarView(
+        controller: _tabController,
+        children: [
+          Container(child: ConfirmedEmployeesMenuPage()),
+          Container(child: PendingEmployeesMenuPage())
+        ],
+      )),
+    ]);
   }
 }
