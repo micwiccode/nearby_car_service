@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
-
-import 'cars_menu_page.dart';
+import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'employee_workshops_page.dart';
+import 'orders_page.dart';
+import 'transactions_page.dart';
 
 class MainMenuPage extends StatefulWidget {
   final AppUser user;
@@ -12,16 +15,12 @@ class MainMenuPage extends StatefulWidget {
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  int _selectedIndex = 1;
+
   static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    CarsMenuPage(),
-    // WorkshopsMap(),
+    EmployeeWorkshopsMenuPage(),
+    OrdersMenuPage(),
+    TransactionsMenuPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -32,23 +31,28 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appUser = Provider.of<AppUser?>(context);
+
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: FutureProvider<String?>.value(
+          initialData: null,
+          value: getPreferencesEmployeeWorkshopUid(appUser!.uid),
+          child: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          )),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.business_center_outlined),
+            label: 'My workshops',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car),
-            label: 'My cars',
+            icon: Icon(Icons.calendar_today),
+            label: 'Orders',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.car_repair),
-            label: 'Workshops',
+            icon: Icon(Icons.payment),
+            label: 'Transactions',
           ),
         ],
         currentIndex: _selectedIndex,

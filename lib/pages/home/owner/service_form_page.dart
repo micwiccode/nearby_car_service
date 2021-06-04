@@ -6,7 +6,6 @@ import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
 import 'package:nearby_car_service/pages/shared/price_input.dart';
 import 'package:nearby_car_service/utils/services_service.dart';
-import 'package:provider/provider.dart';
 
 class ServiceFormPage extends StatefulWidget {
   final Service? service;

@@ -105,6 +105,6 @@ class _ProfileFormState extends State<ProfileForm> {
 
     databaseService = DatabaseService(uid: appUser!.uid);
 
-    return Form(key: _profileFormKey, child: _buildProfileForm(appUser!));
+    return Form(key: _profileFormKey, child: _buildProfileForm(appUser));
   }
 }

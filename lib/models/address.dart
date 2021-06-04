@@ -17,7 +17,7 @@ class Address {
   @override
   String toString() => "$street, $streetNumber, $city, $zipCode, $coords";
 
-  String getAddressDetails() => "$street $streetNumber, $zipCode $city";
+  String getAddressDetails() => "$city $street $streetNumber";
 
   Map<String, dynamic> toMap() {
     return {

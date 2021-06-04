@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
+import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 import 'client/main_menu_page.dart' as ClientMainMenuPage;
 import 'owner/main_menu_page.dart' as OwnertMainMenuPage;
+import 'employee/main_menu_page.dart' as EmployeeMainMenuPage;
 
 class RoleBasedPage extends StatefulWidget {
   final AppUser user;
@@ -16,35 +19,14 @@ class RoleBasedPage extends StatefulWidget {
 }
 
 class _RoleBasedPageState extends State<RoleBasedPage> {
-  String _currentRole = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserRole();
-  }
-
-  _loadUserRole() async {
-    print(widget.user);
-    List<String> appUserRoles = widget.user.roles!;
-    String? prefsRole = await getPreferencesUserRole(widget.user.uid);
-    String newRole = prefsRole != null && appUserRoles.contains(prefsRole)
-        ? prefsRole
-        : appUserRoles.first;
-
-    setState(() {
-      _currentRole = newRole;
-    });
-  }
-
-  Widget _loadMenuBasedOnRole() {
-    switch (_currentRole) {
+  Widget _loadMenuBasedOnRole(String role) {
+    switch (role) {
       case ROLES.CLIENT:
         return ClientMainMenuPage.MainMenuPage(user: widget.user);
       case ROLES.OWNER:
         return OwnertMainMenuPage.MainMenuPage();
-      // case ROLES.EMPLOYEE:
-      //   return MainMenuPage(user: widget.user);
+      case ROLES.EMPLOYEE:
+        return EmployeeMainMenuPage.MainMenuPage(user: widget.user);
       default:
         return ClientMainMenuPage.MainMenuPage(user: widget.user);
     }
@@ -52,6 +34,20 @@ class _RoleBasedPageState extends State<RoleBasedPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _loadMenuBasedOnRole();
+    return FutureBuilder<StreamingSharedPreferences>(
+        future: StreamingSharedPreferences.instance,
+        builder: (BuildContext context,
+            AsyncSnapshot<StreamingSharedPreferences> prefsSnapshot) {
+          if (!prefsSnapshot.hasData) {
+            return LoadingSpinner();
+          }
+
+          return PreferenceBuilder<String>(
+              preference: getSteamPreferencesUserRole(
+                  prefsSnapshot.data!, widget.user.uid),
+              builder: (BuildContext context, String role) {
+                return _loadMenuBasedOnRole(role);
+              });
+        });
   }
 }

@@ -4,13 +4,15 @@ import 'package:nearby_car_service/models/coords.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 
 class WorkshopDatabaseService {
-  final String appUserUid;
-  WorkshopDatabaseService({required this.appUserUid});
+  final String? appUserUid;
+  final String? workshopUid;
+
+  WorkshopDatabaseService({this.appUserUid, this.workshopUid});
+
   static final CollectionReference collection =
       FirebaseFirestore.instance.collection('workshops');
 
   static Future<List<Workshop>> searchWorkshops(String input) async {
-    print('input: $input');
     List<Workshop> res = await collection
         .where("searchKeys", arrayContains: input.toLowerCase())
         .get()
@@ -18,7 +20,6 @@ class WorkshopDatabaseService {
       return _workshopsFromSnapshot(doc);
     });
 
-    print('res: $res');
     return res;
   }
 
@@ -66,6 +67,10 @@ class WorkshopDatabaseService {
 
   Future removeWorkshop(String workshopUid) async {
     return collection.doc(workshopUid).delete();
+  }
+
+  Stream<Workshop> get employeeWorkshop {
+    return collection.doc(workshopUid).snapshots().map(_mapWorkshop);
   }
 
   Stream<List<Workshop>> get workshops {

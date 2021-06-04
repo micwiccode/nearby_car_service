@@ -8,8 +8,10 @@ import 'button.dart';
 class SlideUpRolesPanel extends StatefulWidget {
   final List<String> roles;
   final Function onSelect;
+  final String? currentRole;
+
   const SlideUpRolesPanel(
-      {required this.roles, required this.onSelect, Key? key})
+      {required this.roles, required this.onSelect, this.currentRole, Key? key})
       : super(key: key);
 
   @override
@@ -22,14 +24,15 @@ class _SlideUpRolesPanelState extends State<SlideUpRolesPanel> {
   @override
   void initState() {
     super.initState();
-    _selectedRole = widget.roles.first;
+    _selectedRole =
+        widget.currentRole == null ? widget.roles.first : widget.currentRole!;
   }
 
   Widget buildRadioButton(String text, String value, onChanged) {
     return RadioListTile<String>(
         title: Text(text),
         value: value,
-        groupValue: widget.roles.first,
+        groupValue: _selectedRole,
         onChanged: (val) => onChanged(val));
   }
 

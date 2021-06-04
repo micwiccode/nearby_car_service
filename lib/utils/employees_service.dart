@@ -1,14 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/employee.dart';
-import 'package:nearby_car_service/models/workshop.dart';
+import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'database.dart';
 import 'notifications_service.dart';
 import 'workshop_service.dart';
 
 class EmployeesDatabaseService {
-  final String workshopUid;
-  EmployeesDatabaseService({required this.workshopUid});
+  final String? workshopUid;
+  final String? appUserUid;
+
+  EmployeesDatabaseService({this.workshopUid, this.appUserUid});
+
   final CollectionReference collection =
       FirebaseFirestore.instance.collection('employees');
 
@@ -42,8 +45,12 @@ class EmployeesDatabaseService {
       throw 'No user with such email address';
     }
 
+    if (workshopUid == null) {
+      throw 'No workshopUid provided';
+    }
+
     Employee employee = Employee(
-        workshopUid: workshopUid,
+        workshopUid: workshopUid!,
         appUserUid: appUser.uid,
         position: position,
         isConfirmedByOwner: true);
@@ -64,6 +71,7 @@ class EmployeesDatabaseService {
 
     if (employee != null) {
       await acceptWorkshopInvitation(employee.uid);
+      await setPreferencesEmployeeWorkshopUid(workshopUid, appUserUid);
     } else {
       Employee employee = Employee(
           workshopUid: workshopUid,
@@ -107,11 +115,29 @@ class EmployeesDatabaseService {
         .update({'isConfirmedByEmployee': true, 'isConfirmed': true});
   }
 
-  Stream<List<Employee>> get employees {
-    return collection.snapshots().map(_employeesFromSnapshot);
+  Stream<List<Employee>> get userEmployees {
+    return collection
+        .where("appUserUid", isEqualTo: appUserUid)
+        .snapshots()
+        .map(_employeesFromSnapshot);
+  }
+
+  Future<Employee?> getEmployeeByUserAndWorkshop(String workshopUid, String appUserUid ) {
+     return collection
+        .where("workshopUid", isEqualTo: workshopUid)
+        .where("appUserUid", isEqualTo: appUserUid)
+        .limit(1)
+        .get()
+        .then((QuerySnapshot doc) {
+      return doc.docs.length > 0 ? _mapEmployee(doc.docs[0]) : null;
+    });
   }
 
   Stream<List<Employee>> get workshopConfirmedEmployees {
+    if (workshopUid == null) {
+      throw 'No workshopUid provided';
+    }
+
     return collection
         .where("workshopUid", isEqualTo: workshopUid)
         .where("isConfirmed", isEqualTo: true)
@@ -120,6 +146,10 @@ class EmployeesDatabaseService {
   }
 
   Stream<List<Employee>> get workshopPendingEmployees {
+    if (workshopUid == null) {
+      throw 'No workshopUid provided';
+    }
+
     return collection
         .where("workshopUid", isEqualTo: workshopUid)
         .where("isConfirmed", isEqualTo: false)
