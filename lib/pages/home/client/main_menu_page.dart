@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
-
 import 'cars_menu_page.dart';
+import 'workshops_menu_page.dart';
 
 class MainMenuPage extends StatefulWidget {
   final AppUser user;
@@ -21,7 +21,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       style: optionStyle,
     ),
     CarsMenuPage(),
-    // WorkshopsMap(),
+    WorkshopsMenuPage(),
   ];
 
   void _onItemTapped(int index) {

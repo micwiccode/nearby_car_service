@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/service.dart';
 import 'package:nearby_car_service/models/workshop.dart';
-import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
-import 'package:nearby_car_service/pages/home/owner/services_list.dart';
-import 'package:nearby_car_service/utils/services_service.dart';
+import 'package:nearby_car_service/pages/shared/services_view.dart';
 import 'package:provider/provider.dart';
+
+import 'service_form_page.dart';
 
 class SerivcesMenuPage extends StatefulWidget {
   const SerivcesMenuPage({Key? key}) : super(key: key);
@@ -14,6 +14,21 @@ class SerivcesMenuPage extends StatefulWidget {
 }
 
 class _SerivcesMenuPageState extends State<SerivcesMenuPage> {
+  bool _isEditable = false;
+
+  void openServiceForm(Service? service, String? workshopUid) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => ServiceFormPage(
+            service: service,
+            workshopUid:
+                workshopUid == null ? service!.workshopUid : workshopUid),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final workshop = Provider.of<Workshop?>(context);
@@ -22,22 +37,24 @@ class _SerivcesMenuPageState extends State<SerivcesMenuPage> {
       return Text('No services');
     }
 
-    return StreamBuilder<List<Service>>(
-      stream:
-          ServicesDatabaseService(workshopUid: workshop.uid).myWorkshopServices,
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Something went wrong');
-        }
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return LoadingSpinner();
-        }
-
-        return ServicesList(
-            services: snapshot.data == null ? [] : snapshot.data!,
-            workshopUid: workshop.uid);
-      },
-    );
+    return Scaffold(
+        body: SingleChildScrollView(
+            child: ServicesView(
+                workshop: workshop,
+                isEditable: false,
+                openServiceForm: openServiceForm)),
+        floatingActionButton: FloatingActionButton(
+          mini: _isEditable,
+          onPressed: () {
+            if (_isEditable) {
+              openServiceForm(null, workshop.uid);
+            } else {
+              setState(() {
+                _isEditable = !_isEditable;
+              });
+            }
+          },
+          child: Icon(_isEditable ? Icons.add : Icons.edit),
+        ));
   }
 }

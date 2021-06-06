@@ -6,9 +6,10 @@ import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 
 class WorkshopsList extends StatefulWidget {
   final List<Workshop> workshops;
-  final String? employeeWorkshopUid;
+  final Function openWorkshopClientPage;
 
-  WorkshopsList({required this.workshops, this.employeeWorkshopUid, Key? key})
+  WorkshopsList(
+      {required this.workshops, required this.openWorkshopClientPage, Key? key})
       : super(key: key);
 
   @override
@@ -16,40 +17,15 @@ class WorkshopsList extends StatefulWidget {
 }
 
 class _WorkshopsListState extends State<WorkshopsList> {
-  Color _getTileColor(Workshop workshop) {
-    return _isWorkshopActive(workshop) ? Colors.black : Colors.black26;
-  }
-
-  bool _isWorkshopActive(Workshop workshop) {
-    return widget.employeeWorkshopUid == null ||
-        workshop.uid == widget.employeeWorkshopUid;
-  }
-
-  // void openWorkshopForm(Workshop? service) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute<void>(
-  //       builder: (BuildContext context) =>
-  //           WorkshopFormPage(service: service, workshopUid: widget.workshopUid),
-  //       fullscreenDialog: true,
-  //     ),
-  //   );
-  // }
-
   Widget _buildTile(Workshop workshop) {
-    bool isWorkshopActive = _isWorkshopActive(workshop);
-    Color tileColor = _getTileColor(workshop);
-
     Address address = workshop.address!;
 
     return ListTile(
-        trailing: widget.employeeWorkshopUid != null
-            ? Icon(Icons.more_horiz, size: 20.0)
-            : null,
         title: Text(workshop.name,
-            style: TextStyle(fontWeight: FontWeight.w700, color: tileColor)),
-        subtitle: Text(address.getAddressDetails(),
-            style: TextStyle(color: tileColor)),
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            )),
+        subtitle: Text(address.getAddressDetails()),
         leading:
             (workshop.avatar != null && workshop.avatar!.contains('/storage'))
                 ? CachedNetworkImage(
@@ -73,35 +49,20 @@ class _WorkshopsListState extends State<WorkshopsList> {
                     size: 25.0,
                   ),
         onTap: () {
-          // if (_isEditable) {
-          //   openWorkshopForm(service);
-          // }
+          widget.openWorkshopClientPage(workshop);
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: widget.workshops.length < 1
-            ? Center(child: Text('You have no workshops'))
-            : SingleChildScrollView(
-                child: Column(
-                  children: widget.workshops.map((Workshop workshop) {
-                    return _buildTile(workshop);
-                  }).toList(),
-                ),
-              ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // if (_isEditable) {
-            //   openWorkshopForm(null);
-            // } else {
-            //   setState(() {
-            //     _isEditable = !_isEditable;
-            //   });
-            // }
-          },
-          child: Icon(Icons.add),
-        ));
+    return widget.workshops.length < 1
+        ? Center(child: Text('No workshops'))
+        : ListView(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            children: widget.workshops.map((Workshop workshop) {
+              return _buildTile(workshop);
+            }).toList(),
+          );
   }
 }

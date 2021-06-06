@@ -66,6 +66,14 @@ class ServicesDatabaseService {
         .map(_servicesFromSnapshot);
   }
 
+  Stream<List<Service>> get workshopActiveServices {
+    return collection
+        .where("workshopUid", isEqualTo: workshopUid)
+        .where("isActive", isEqualTo: true)
+        .snapshots()
+        .map(_servicesFromSnapshot);
+  }
+
   List<Service> _servicesFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((service) {
       return _mapService(service);

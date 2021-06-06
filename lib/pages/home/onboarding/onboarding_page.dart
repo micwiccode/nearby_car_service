@@ -23,36 +23,6 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   late DatabaseService databaseService;
   int _step = 1;
-  // late AppUser _user;
-  // Workshop _workshop = Workshop(
-  //   name: '',
-  //   email: '',
-  //   phoneNumber: '',
-  //   address: new Address(street: '', streetNumber: '', city: '', zipCode: ''),
-  // );
-  // Employee _employee = Employee();
-  // Car _car = Car();
-
-  // List<Workshop> testWorkshops = <Workshop>[
-  //   Workshop(
-  //       name: '123',
-  //       email: 'email',
-  //       phoneNumber: 'phoneNumber',
-  //       address: Address(
-  //           street: 'street',
-  //           streetNumber: 'streetNum',
-  //           zipCode: '11-111',
-  //           city: 'City')),
-  //   Workshop(
-  //       name: '234',
-  //       email: 'email',
-  //       phoneNumber: 'phoneNumber',
-  //       address: Address(
-  //           street: 'street',
-  //           streetNumber: 'streetNum',
-  //           zipCode: '11-111',
-  //           city: 'City')),
-  // ];
 
   Future<void> skipOnboarding() async {
     await databaseService.updateAppUserOnboardingStep(4);
@@ -90,33 +60,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
     databaseService = DatabaseService(uid: appUser!.uid);
 
     if (widget.user != null && widget.user!.onboardingStep != null) {
-      // setState(() => _user = widget.user!);
       initateOnbordingStep();
     }
-    // else {
-    //   setState(() => _user =
-    //       AppUser(uid: appUser.uid, roles: [ROLES.CLIENT], onboardingStep: 2));
-    // }
-
-    // Future<void> saveStepState() async {
-    //   if (_step == 1) {
-    //     await databaseService.updateAppUser(_user);
-    //   } else if (_step == 2) {
-    //     await databaseService.updateAppUserRole(_user.roles ?? [ROLES.CLIENT]);
-    //   } else {
-    //     switch (_user.roles![0]) {
-    //       case ROLES.CLIENT:
-    //         print(_car);
-    //         break;
-    //       case ROLES.EMPLOYEE:
-    //         print(_employee);
-    //         break;
-    //       case ROLES.OWNER:
-    //         print(_workshop);
-    //         break;
-    //     }
-    //   }
-    // }
 
     return Container(
         padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 20.0),
