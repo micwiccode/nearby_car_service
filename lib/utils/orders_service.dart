@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby_car_service/models/order.dart';
 
 import 'package:nearby_car_service/consts/service_statuses.dart' as STATUSES;
+import 'package:nearby_car_service/models/service.dart';
 
 class OrdersDatabaseService {
   final String? workshopUid;
@@ -18,8 +19,9 @@ class OrdersDatabaseService {
       'appUserUid': order.appUserUid,
       'workshopUid': order.workshopUid,
       'price': order.price,
-      'services': order.services,
+      'services': order.services.map((service) => service.toMap()).toList(),
       'status': order.status,
+      'createdAt': DateTime.now(),
     });
   }
 
@@ -34,6 +36,36 @@ class OrdersDatabaseService {
         'status': order.status,
       });
     }
+  }
+
+  Map<String, DateTime> _getStatusTimeMap(String status) {
+    switch (status) {
+      case STATUSES.ACCEPTED:
+        {
+          return {'accepteddAt': DateTime.now()};
+        }
+
+      case STATUSES.IN_PROGRESS:
+        {
+          return {'progressedAt': DateTime.now()};
+        }
+
+      case STATUSES.DONE:
+        {
+          return {'doneAt': DateTime.now()};
+        }
+
+      default:
+        {
+          return {'accepteddAt': DateTime.now()};
+        }
+    }
+  }
+
+  Future updateOrderStatus(String orderUid, String status) async {
+    return collection
+        .doc(orderUid)
+        .update({'status': status, ..._getStatusTimeMap(status)});
   }
 
   Future removeOrder(String orderUid) async {
@@ -56,7 +88,7 @@ class OrdersDatabaseService {
   }
 
   Stream<List<Order>> get workshopOrders {
-    if (appUserUid == null) {
+    if (workshopUid == null) {
       throw ('WorkshoprUid is not provided');
     }
 
@@ -72,15 +104,51 @@ class OrdersDatabaseService {
     }).toList();
   }
 
-  Order _mapOrder(service) {
+  List<Service> _serviceFromMap(services) {
+    List<Service> res = [];
+
+    services.forEach((s) => res.add(Service(
+        uid: s['uid'],
+        workshopUid: s['workshopUid'],
+        name: s['name'],
+        minPrice: s['minPrice'],
+        isActive: s['isActive'])));
+
+    return res;
+  }
+
+  Order _mapOrder(order) {
+    List<Service> services = _serviceFromMap(order.data()!['services'] ?? []);
+
+    dynamic createdAtTimestamp = order.data()!['createdAt'];
+    dynamic accepteddAtTimestamp = order.data()!['accepteddAt'];
+    dynamic progressedAtTimestamp = order.data()!['progressedAt'];
+    dynamic doneAtTimestamp = order.data()!['doneAt'];
+
     return Order(
-      uid: service.id,
-      carUid: service.data()!['carUid'] ?? '',
-      appUserUid: service.data()!['appUserUid'] ?? '',
-      workshopUid: service.data()!['workshopUid'] ?? '',
-      price: service.data()!['price'] ?? '',
-      services: service.data()!['services'] ?? [],
-      status: service.data()!['isActive'] ?? STATUSES.NEW,
+      uid: order.id,
+      carUid: order.data()!['carUid'] ?? '',
+      appUserUid: order.data()!['appUserUid'] ?? '',
+      workshopUid: order.data()!['workshopUid'] ?? '',
+      price: order.data()!['price'] ?? '',
+      services: services,
+      status: order.data()!['isActive'] ?? STATUSES.NEW,
+      createdAt: createdAtTimestamp != null
+          ? DateTime.fromMicrosecondsSinceEpoch(
+              createdAtTimestamp.microsecondsSinceEpoch)
+          : null,
+      accepteddAt: accepteddAtTimestamp != null
+          ? (DateTime.fromMicrosecondsSinceEpoch(
+              accepteddAtTimestamp.microsecondsSinceEpoch))
+          : null,
+      progressedAt: progressedAtTimestamp != null
+          ? (DateTime.fromMicrosecondsSinceEpoch(
+              progressedAtTimestamp.microsecondsSinceEpoch))
+          : null,
+      doneAt: doneAtTimestamp != null
+          ? (DateTime.fromMicrosecondsSinceEpoch(
+              doneAtTimestamp.microsecondsSinceEpoch))
+          : null,
     );
   }
 }

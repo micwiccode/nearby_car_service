@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/service.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
-import 'package:nearby_car_service/pages/home/owner/services_list.dart';
+import 'package:nearby_car_service/pages/shared/services_list.dart';
 import 'package:nearby_car_service/utils/services_service.dart';
 import 'package:provider/provider.dart';
 
@@ -34,9 +34,7 @@ class _TransactionsMenuPageState extends State<TransactionsMenuPage> {
           return LoadingSpinner();
         }
 
-        return ServicesList(
-            services: snapshot.data == null ? [] : snapshot.data!,
-            workshopUid: workshop.uid);
+        return LoadingSpinner();
       },
     );
   }

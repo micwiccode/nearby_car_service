@@ -3,7 +3,7 @@ import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/services_view.dart';
 import 'package:nearby_car_service/pages/shared/workshop_view.dart';
 
-import 'create_order_page.dart';
+import 'order/order_steps_page.dart';
 
 class WorkshopClientPage extends StatefulWidget {
   final Workshop workshop;
@@ -23,14 +23,17 @@ class _WorkshopClientPageState extends State<WorkshopClientPage> {
         context,
         MaterialPageRoute<void>(
           builder: (BuildContext context) =>
-              CreateOrderPage(workshop: widget.workshop),
+              OrderStepsPage(workshop: widget.workshop),
           fullscreenDialog: true,
         ),
       );
     }
 
     return Scaffold(
-        appBar: AppBar(title: Text(widget.workshop.name)),
+        appBar: AppBar(
+          title: Text(widget.workshop.name),
+          backgroundColor: Colors.amber,
+        ),
         body: Container(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 80),
             child: SingleChildScrollView(
@@ -46,7 +49,10 @@ class _WorkshopClientPageState extends State<WorkshopClientPage> {
                       child: Text('Services',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 18.0))),
-                  ServicesView(workshop: widget.workshop, onlyActive: true, isEditable: false),
+                  ServicesView(
+                      workshop: widget.workshop,
+                      onlyActive: true,
+                      isEditable: false),
                 ]))),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton(

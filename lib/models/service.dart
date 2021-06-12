@@ -15,4 +15,14 @@ class Service {
 
   @override
   String toString() => "$workshopUid, $name, $minPrice, $isActive";
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uid': uid,
+      'workshopUid': workshopUid,
+      'name': name,
+      'minPrice': minPrice,
+      'isActive': isActive,
+    };
+  }
 }

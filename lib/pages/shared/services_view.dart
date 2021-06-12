@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/service.dart';
 import 'package:nearby_car_service/models/workshop.dart';
-import 'package:nearby_car_service/pages/home/owner/services_list.dart';
+import 'package:nearby_car_service/pages/shared/services_list.dart';
 import 'package:nearby_car_service/utils/services_service.dart';
 
 import 'loading_spinner.dart';

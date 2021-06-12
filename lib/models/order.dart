@@ -10,6 +10,10 @@ class Order {
   int price;
   List<Service> services;
   String status;
+  DateTime? createdAt;
+  DateTime? accepteddAt;
+  DateTime? progressedAt;
+  DateTime? doneAt;
 
   Order({
     this.uid = '',
@@ -19,8 +23,13 @@ class Order {
     this.price = 0,
     this.services = const [],
     this.status = STATUSES.NEW,
+    this.createdAt,
+    this.accepteddAt,
+    this.progressedAt,
+    this.doneAt,
   });
 
   @override
-  String toString() => "$uid, $carUid, $appUserUid, $workshopUid, $price, $status,  $services";
+  String toString() =>
+      "$uid, $carUid, $appUserUid, $workshopUid, $price, $status, $services";
 }

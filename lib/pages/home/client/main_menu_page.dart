@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'cars_menu_page.dart';
+import 'orders_menu_page.dart';
 import 'workshops_menu_page.dart';
 
 class MainMenuPage extends StatefulWidget {
@@ -13,13 +14,9 @@ class MainMenuPage extends StatefulWidget {
 
 class _MainMenuPageState extends State<MainMenuPage> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+ 
   static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
+    OrdersMenuPage(),
     CarsMenuPage(),
     WorkshopsMenuPage(),
   ];
@@ -40,7 +37,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'Orders',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.directions_car),

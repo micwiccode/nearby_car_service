@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/service.dart';
-import 'package:nearby_car_service/helpers/formatPrice.dart';
+import 'package:nearby_car_service/pages/shared/service_tile.dart';
 
 class ServicesList extends StatefulWidget {
   final List<Service> services;
@@ -31,26 +31,12 @@ class _ServicesListState extends State<ServicesList> {
     bool isServiceActive = _isServiceActive(service);
     Color tileColor = _getTileColor(service);
 
-    return ListTile(
-        trailing: widget.isEditable ? Icon(Icons.more_horiz, size: 20.0) : null,
-        leading: isServiceActive
-            ? Icon(
-                Icons.check_circle_outlined,
-                color: Colors.amber[600],
-              )
-            : Icon(
-                Icons.cancel,
-                color: Colors.black26,
-              ),
-        title: Text(service.name,
-            style: TextStyle(fontWeight: FontWeight.w700, color: tileColor)),
-        subtitle: Text('Min price: ${formatPrice(service.minPrice)}',
-            style: TextStyle(color: tileColor)),
-        onTap: () {
-          if (widget.openServiceForm != null && widget.isEditable) {
-            widget.openServiceForm!(service);
-          }
-        });
+    return ServiceTile(
+        service: service,
+        isEditable: widget.isEditable,
+        tileColor: tileColor,
+        onTap: widget.openServiceForm,
+        isServiceActive: isServiceActive);
   }
 
   @override
