@@ -31,7 +31,7 @@ class ServicesDatabaseService {
 
   Future updateService(Service service) async {
     if (service.uid.length > 0) {
-      return collection.doc(service.uid).set({
+      return collection.doc(service.uid).update({
         'workshopUid': workshopUid,
         'name': service.name,
         'minPrice': service.minPrice,
@@ -42,7 +42,7 @@ class ServicesDatabaseService {
 
   Future updateServices(List<Service> services) async {
     for (Service service in services) {
-      await collection.doc(service.uid).set({
+      await collection.doc(service.uid).update({
         'workshopUid': workshopUid,
         'name': service.name,
         'minPrice': service.minPrice,

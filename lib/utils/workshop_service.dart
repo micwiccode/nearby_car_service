@@ -54,7 +54,7 @@ class WorkshopDatabaseService {
 
   Future updateWorkshop(Workshop workshop) async {
     if (workshop.uid.length > 0) {
-      return collection.doc(workshop.uid).set({
+      return collection.doc(workshop.uid).update({
         'appUserUid': appUserUid,
         'name': workshop.name,
         'email': workshop.email,

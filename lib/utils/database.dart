@@ -8,7 +8,15 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('appUsers');
 
   Future createAppUser(AppUser user) async {
-    return await _setAppUser(user);
+    return collection.add({
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'email': user.email,
+      'phoneNumber': user.phoneNumber,
+      'roles': user.roles,
+      'avatar': user.avatar,
+      'onboardingStep': user.onboardingStep ?? 1,
+    });
   }
 
   static Future<AppUser?> getAppUserWithEmail(String email) async {
@@ -23,7 +31,15 @@ class DatabaseService {
   }
 
   Future updateAppUser(AppUser user) async {
-    return await _setAppUser(user);
+    return collection.doc(uid).update({
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'email': user.email,
+      'phoneNumber': user.phoneNumber,
+      'roles': user.roles,
+      'avatar': user.avatar,
+      'onboardingStep': user.onboardingStep ?? 1,
+    });
   }
 
   Future updateAppUserRole(List<String> roles) async {
@@ -37,18 +53,6 @@ class DatabaseService {
   Future addAppUserRole(String role) async {
     return collection.doc(uid).update({
       "roles": FieldValue.arrayUnion([role])
-    });
-  }
-
-  Future<void> _setAppUser(AppUser user) {
-    return collection.doc(uid).set({
-      'firstName': user.firstName,
-      'lastName': user.lastName,
-      'email': user.email,
-      'phoneNumber': user.phoneNumber,
-      'roles': user.roles,
-      'avatar': user.avatar,
-      'onboardingStep': user.onboardingStep ?? 1,
     });
   }
 

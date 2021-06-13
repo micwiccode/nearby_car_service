@@ -10,10 +10,7 @@ class Order {
   int price;
   List<Service> services;
   String status;
-  DateTime? createdAt;
-  DateTime? accepteddAt;
-  DateTime? progressedAt;
-  DateTime? doneAt;
+  List<Map<String, dynamic>> events;
 
   Order({
     this.uid = '',
@@ -23,13 +20,10 @@ class Order {
     this.price = 0,
     this.services = const [],
     this.status = STATUSES.NEW,
-    this.createdAt,
-    this.accepteddAt,
-    this.progressedAt,
-    this.doneAt,
+    this.events = const [],
   });
 
   @override
   String toString() =>
-      "$uid, $carUid, $appUserUid, $workshopUid, $price, $status, $services";
+      "$uid, $carUid, $appUserUid, $workshopUid, $price, $status, $services, $events";
 }

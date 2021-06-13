@@ -51,7 +51,7 @@ class _SlideUpRolesPanelState extends State<SlideUpRolesPanel> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-      child: Column(children: <Widget>[
+      child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
         ...buildRadioButtons(),
         Button(
             text: 'Continue',

@@ -2,13 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby_car_service/models/order.dart';
 
 import 'package:nearby_car_service/consts/service_statuses.dart' as STATUSES;
+import 'package:nearby_car_service/consts/order_events_types.dart'
+    as ORDER_EVENTS;
 import 'package:nearby_car_service/models/service.dart';
 
 class OrdersDatabaseService {
   final String? workshopUid;
   final String? appUserUid;
+  final String? orderUid;
 
-  OrdersDatabaseService({this.workshopUid, this.appUserUid});
+  OrdersDatabaseService({this.workshopUid, this.appUserUid, this.orderUid});
 
   final CollectionReference collection =
       FirebaseFirestore.instance.collection('orders');
@@ -21,7 +24,9 @@ class OrdersDatabaseService {
       'price': order.price,
       'services': order.services.map((service) => service.toMap()).toList(),
       'status': order.status,
-      'createdAt': DateTime.now(),
+      'events': [
+        {'date': DateTime.now(), 'type': ORDER_EVENTS.CREATE}
+      ],
     });
   }
 
@@ -38,38 +43,106 @@ class OrdersDatabaseService {
     }
   }
 
-  Map<String, DateTime> _getStatusTimeMap(String status) {
+  Map<String, dynamic> _getStatusTimeMap(String status, String employeeUid) {
     switch (status) {
       case STATUSES.ACCEPTED:
         {
-          return {'accepteddAt': DateTime.now()};
+          return {
+            'date': DateTime.now(),
+            'type': ORDER_EVENTS.ACCEPT,
+            'employeeUid': employeeUid
+          };
         }
 
       case STATUSES.IN_PROGRESS:
         {
-          return {'progressedAt': DateTime.now()};
+          return {
+            'date': DateTime.now(),
+            'type': ORDER_EVENTS.PROGRESS,
+            'employeeUid': employeeUid
+          };
         }
 
       case STATUSES.DONE:
         {
-          return {'doneAt': DateTime.now()};
+          return {
+            'date': DateTime.now(),
+            'type': ORDER_EVENTS.DONE,
+            'employeeUid': employeeUid
+          };
         }
 
       default:
         {
-          return {'accepteddAt': DateTime.now()};
+          return {
+            'date': DateTime.now(),
+            'type': ORDER_EVENTS.CREATE,
+            'employeeUid': employeeUid
+          };
         }
     }
   }
 
-  Future updateOrderStatus(String orderUid, String status) async {
-    return collection
-        .doc(orderUid)
-        .update({'status': status, ..._getStatusTimeMap(status)});
+  Future updateOrderStatus(
+      String orderUid, String employeeUid, String status) async {
+    return collection.doc(orderUid).update({
+      'status': status,
+      "events": FieldValue.arrayUnion([_getStatusTimeMap(status, employeeUid)])
+    });
+  }
+
+  Future addOrderQuestion(String orderUid, String content) async {
+    return collection.doc(orderUid).update({
+      "events": FieldValue.arrayUnion([
+        {
+          'date': DateTime.now(),
+          'type': ORDER_EVENTS.CLIENT_QUESTION,
+          'content': content
+        }
+      ])
+    });
+  }
+
+  Future addOrderInfo(
+      String orderUid, String employeeUid, String content) async {
+    return collection.doc(orderUid).update({
+      "events": FieldValue.arrayUnion([
+        {
+          'date': DateTime.now(),
+          'type': ORDER_EVENTS.EMPLOYEE_INFO,
+          'content': content
+        }
+      ])
+    });
+  }
+
+  Future changeOrderPrice(
+    String orderUid,
+    String employeeUid,
+    String content,
+    int price,
+  ) async {
+    return collection.doc(orderUid).update({
+      'price': price,
+      "events": FieldValue.arrayUnion([
+        {
+          'date': DateTime.now(),
+          'type': ORDER_EVENTS.CHANGE_PRICE,
+          'content': content
+        }
+      ])
+    });
   }
 
   Future removeOrder(String orderUid) async {
     return collection.doc(orderUid).delete();
+  }
+
+  Stream<Order> get order {
+    if (orderUid == null) {
+      throw ('OrderUid is not provided');
+    }
+    return collection.doc(orderUid).snapshots().map(_mapOrder);
   }
 
   Stream<List<Order>> get orders {
@@ -117,38 +190,48 @@ class OrdersDatabaseService {
     return res;
   }
 
+  List<Map<String, dynamic>> _mapEvents(events) {
+    List<Map<String, dynamic>> res = [];
+
+    events.forEach((event) => res.add({
+          ...event,
+          'date': DateTime.fromMicrosecondsSinceEpoch(
+              event['date'].microsecondsSinceEpoch)
+        }));
+
+    return res;
+  }
+
   Order _mapOrder(order) {
     List<Service> services = _serviceFromMap(order.data()!['services'] ?? []);
-
-    dynamic createdAtTimestamp = order.data()!['createdAt'];
-    dynamic accepteddAtTimestamp = order.data()!['accepteddAt'];
-    dynamic progressedAtTimestamp = order.data()!['progressedAt'];
-    dynamic doneAtTimestamp = order.data()!['doneAt'];
+    List<Map<String, dynamic>> events =
+        _mapEvents(order.data()!['events'] ?? []);
 
     return Order(
-      uid: order.id,
-      carUid: order.data()!['carUid'] ?? '',
-      appUserUid: order.data()!['appUserUid'] ?? '',
-      workshopUid: order.data()!['workshopUid'] ?? '',
-      price: order.data()!['price'] ?? '',
-      services: services,
-      status: order.data()!['isActive'] ?? STATUSES.NEW,
-      createdAt: createdAtTimestamp != null
-          ? DateTime.fromMicrosecondsSinceEpoch(
-              createdAtTimestamp.microsecondsSinceEpoch)
-          : null,
-      accepteddAt: accepteddAtTimestamp != null
-          ? (DateTime.fromMicrosecondsSinceEpoch(
-              accepteddAtTimestamp.microsecondsSinceEpoch))
-          : null,
-      progressedAt: progressedAtTimestamp != null
-          ? (DateTime.fromMicrosecondsSinceEpoch(
-              progressedAtTimestamp.microsecondsSinceEpoch))
-          : null,
-      doneAt: doneAtTimestamp != null
-          ? (DateTime.fromMicrosecondsSinceEpoch(
-              doneAtTimestamp.microsecondsSinceEpoch))
-          : null,
-    );
+        uid: order.id,
+        carUid: order.data()!['carUid'] ?? '',
+        appUserUid: order.data()!['appUserUid'] ?? '',
+        workshopUid: order.data()!['workshopUid'] ?? '',
+        price: order.data()!['price'] ?? '',
+        services: services,
+        status: order.data()!['isActive'] ?? STATUSES.NEW,
+        events: events
+        // createdAt: createdAtTimestamp != null
+        //     ? DateTime.fromMicrosecondsSinceEpoch(
+        //         createdAtTimestamp.microsecondsSinceEpoch)
+        //     : null,
+        // accepteddAt: accepteddAtTimestamp != null
+        //     ? (DateTime.fromMicrosecondsSinceEpoch(
+        //         accepteddAtTimestamp.microsecondsSinceEpoch))
+        //     : null,
+        // progressedAt: progressedAtTimestamp != null
+        //     ? (DateTime.fromMicrosecondsSinceEpoch(
+        //         progressedAtTimestamp.microsecondsSinceEpoch))
+        //     : null,
+        // doneAt: doneAtTimestamp != null
+        //     ? (DateTime.fromMicrosecondsSinceEpoch(
+        //         doneAtTimestamp.microsecondsSinceEpoch))
+        //     : null,
+        );
   }
 }

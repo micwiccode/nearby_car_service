@@ -10,6 +10,7 @@ class TextFormFieldWidget extends StatelessWidget {
   final bool onlyDigits;
   final bool numberKeyboardType;
   final bool isLastFormInput;
+  final EdgeInsets padding;
 
   TextFormFieldWidget({
     required this.controller,
@@ -20,6 +21,7 @@ class TextFormFieldWidget extends StatelessWidget {
     this.functionValidate,
     this.numberKeyboardType = false,
     this.isLastFormInput = false,
+    this.padding = const EdgeInsets.all(10.0),
   });
 
   @override
@@ -28,7 +30,7 @@ class TextFormFieldWidget extends StatelessWidget {
 
     return Container(
       child: Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: padding,
           child: TextFormField(
             obscureText: obscureText,
             validator: (value) {

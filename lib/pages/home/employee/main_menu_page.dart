@@ -3,7 +3,7 @@ import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'employee_workshops_page.dart';
-import 'orders_page.dart';
+import 'orders_menu_page.dart';
 import 'transactions_page.dart';
 
 class MainMenuPage extends StatefulWidget {

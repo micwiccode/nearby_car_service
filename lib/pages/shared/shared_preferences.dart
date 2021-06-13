@@ -4,7 +4,8 @@ import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
 
-Preference<String> getSteamPreferencesUserRole(StreamingSharedPreferences prefs, String userUid) {
+Preference<String> getSteamPreferencesUserRole(
+    StreamingSharedPreferences prefs, String userUid) {
   return prefs.getString('CURRENT_ROLE_$userUid', defaultValue: ROLES.CLIENT);
 }
 

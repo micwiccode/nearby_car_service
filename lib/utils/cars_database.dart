@@ -20,7 +20,7 @@ class CarDatabaseService {
 
   Future updateCar(Car car) async {
     if (car.uid.length > 0) {
-      return collection.doc(car.uid).set({
+      return collection.doc(car.uid).update({
         'appUserUid': appUserUid,
         'mark': car.mark,
         'model': car.model,

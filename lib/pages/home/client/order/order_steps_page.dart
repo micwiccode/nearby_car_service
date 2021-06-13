@@ -89,8 +89,6 @@ class _OrderStepsPageState extends State<OrderStepsPage> {
   Widget build(BuildContext context) {
     AppUser? appUser = Provider.of<AppUser?>(context);
 
-    print(_order);
-
     return Scaffold(
         appBar: AppBar(
           title: Text('Add order'),

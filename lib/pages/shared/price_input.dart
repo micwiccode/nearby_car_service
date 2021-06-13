@@ -4,16 +4,27 @@ import 'package:extended_masked_text/extended_masked_text.dart';
 class PriceInput extends StatelessWidget {
   final MoneyMaskedTextController controller;
   final String label;
+  final Function? functionValidate;
 
-  PriceInput({required this.controller, required this.label});
+  PriceInput(
+      {required this.controller, required this.label, this.functionValidate});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
       child: TextFormField(
         controller: controller,
         keyboardType: TextInputType.number,
+        validator: (value) {
+          if (functionValidate != null) {
+            return functionValidate!();
+          }
+          if (value != null && value.trim().isEmpty) {
+            return 'Please enter price';
+          }
+          return null;
+        },
         decoration: InputDecoration(
           labelText: label,
           enabledBorder: OutlineInputBorder(

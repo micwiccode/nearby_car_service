@@ -14,12 +14,10 @@ class MainMenuPage extends StatefulWidget {
 
 class _MainMenuPageState extends State<MainMenuPage> {
   int _selectedIndex = 0;
- 
-  static const List<Widget> _widgetOptions = <Widget>[
-    OrdersMenuPage(),
-    CarsMenuPage(),
-    WorkshopsMenuPage(),
-  ];
+
+  void moveToWrokshopsPage() {
+    _onItemTapped(2);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -29,6 +27,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> _widgetOptions = <Widget>[
+      OrdersMenuPage(changePage: moveToWrokshopsPage),
+      CarsMenuPage(),
+      WorkshopsMenuPage(),
+    ];
+
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

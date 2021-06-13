@@ -137,8 +137,9 @@ class _EmployeeWorkshopsListState extends State<EmployeeWorkshopsList> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 2.0, 0.0, 0.0),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.w700)),
+      padding: EdgeInsets.fromLTRB(16.0, 16.0, 0.0, 0.0),
+      child: Text(text,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22.0)),
     );
   }
 

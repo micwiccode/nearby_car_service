@@ -9,8 +9,10 @@ import 'orders_list.dart';
 class OrdersView extends StatelessWidget {
   final String? workshopUid;
   final String? appUserUid;
+  final String? employeeUid;
 
-  const OrdersView({this.workshopUid, this.appUserUid, Key? key})
+  const OrdersView(
+      {this.workshopUid, this.appUserUid, this.employeeUid, Key? key})
       : super(key: key);
 
   @override
@@ -19,7 +21,8 @@ class OrdersView extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (BuildContext context) => OrderDetailsPage(order: order),
+          builder: (BuildContext context) =>
+              OrderDetailsPage(orderUid: order.uid, employeeUid: employeeUid),
           fullscreenDialog: true,
         ),
       );

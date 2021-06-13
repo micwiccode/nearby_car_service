@@ -32,7 +32,7 @@ class EmployeesDatabaseService {
 
   Future<void> updateEmployeePosition(
       {required String employeeUid, required String position}) async {
-    await collection.doc(employeeUid).set({
+    await collection.doc(employeeUid).update({
       'position': position,
     });
   }
@@ -115,6 +115,17 @@ class EmployeesDatabaseService {
         .update({'isConfirmedByEmployee': true, 'isConfirmed': true});
   }
 
+  Stream<Employee> get employee {
+    if (workshopUid == null || appUserUid == null) {
+      throw ('No workshopUid or appUserUid provided');
+    }
+    return collection
+        .where("appUserUid", isEqualTo: appUserUid)
+        .where("workshopUid", isEqualTo: workshopUid)
+        .snapshots()
+        .map(_employeeFromSnapshot);
+  }
+
   Stream<List<Employee>> get userEmployees {
     return collection
         .where("appUserUid", isEqualTo: appUserUid)
@@ -122,8 +133,9 @@ class EmployeesDatabaseService {
         .map(_employeesFromSnapshot);
   }
 
-  Future<Employee?> getEmployeeByUserAndWorkshop(String workshopUid, String appUserUid ) {
-     return collection
+  Future<Employee?> getEmployeeByUserAndWorkshop(
+      String workshopUid, String appUserUid) {
+    return collection
         .where("workshopUid", isEqualTo: workshopUid)
         .where("appUserUid", isEqualTo: appUserUid)
         .limit(1)
@@ -155,6 +167,11 @@ class EmployeesDatabaseService {
         .where("isConfirmed", isEqualTo: false)
         .snapshots()
         .map(_employeesFromSnapshot);
+  }
+
+  Employee _employeeFromSnapshot(QuerySnapshot snapshot) {
+    QueryDocumentSnapshot doc = snapshot.docs[0];
+    return _mapEmployee(doc);
   }
 
   List<Employee> _employeesFromSnapshot(QuerySnapshot snapshot) {
