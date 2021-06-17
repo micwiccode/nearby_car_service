@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby_car_service/models/car.dart';
 
 class CarDatabaseService {
-  final String appUserUid;
-  CarDatabaseService({required this.appUserUid});
+  final String? appUserUid;
+  final String? carUid;
+
+  CarDatabaseService({this.appUserUid, this.carUid});
   final CollectionReference collection =
       FirebaseFirestore.instance.collection('cars');
 
@@ -31,24 +33,36 @@ class CarDatabaseService {
     }
   }
 
+  Stream<Car> get car {
+    if (carUid == null) {
+      throw 'CarUid not provided';
+    }
+    return collection.doc(carUid).snapshots().map(_carFromSnapshot);
+  }
+
   Stream<List<Car>> get cars {
+    if (appUserUid == null) {
+      throw 'AppUserUid not provided';
+    }
     return collection
         .where("appUserUid", isEqualTo: appUserUid)
         .snapshots()
-        .map(_carFromSnapshot);
+        .map(_carsFromSnapshot);
   }
 
-  List<Car> _carFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.docs.map((s) {
-      return Car(
-        uid: s.id,
-        appUserUid: appUserUid,
-        mark: s.data()!['mark'] ?? '',
-        model: s.data()!['model'] ?? '',
-        fuelType: s.data()!['fuelType'] ?? '',
-        productionYear: s.data()!['productionYear'] ?? '',
-        avatar: s.data()!['avatar'] ?? '',
-      );
-    }).toList();
+  Car _carFromSnapshot(car) {
+    return Car(
+      uid: car.id,
+      appUserUid: car.data()!['appUserUid'] ?? '',
+      mark: car.data()!['mark'] ?? '',
+      model: car.data()!['model'] ?? '',
+      fuelType: car.data()!['fuelType'] ?? '',
+      productionYear: car.data()!['productionYear'] ?? '',
+      avatar: car.data()!['avatar'] ?? '',
+    );
+  }
+
+  List<Car> _carsFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((car) => _carFromSnapshot(car)).toList();
   }
 }

@@ -4,7 +4,7 @@ import 'package:nearby_car_service/models/car.dart';
 import 'package:nearby_car_service/models/order.dart';
 import 'package:nearby_car_service/models/service.dart';
 import 'package:nearby_car_service/models/workshop.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 import 'package:nearby_car_service/utils/orders_service.dart';
 import 'package:provider/provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
@@ -23,7 +23,7 @@ class OrderStepsPage extends StatefulWidget {
 }
 
 class _OrderStepsPageState extends State<OrderStepsPage> {
-  late DatabaseService databaseService;
+  late AppUserDatabaseService databaseService;
   int _step = 1;
   Order _order = Order();
   Car _car = Car();

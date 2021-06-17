@@ -15,7 +15,7 @@ class MainMenuPage extends StatefulWidget {
 class _MainMenuPageState extends State<MainMenuPage> {
   int _selectedIndex = 0;
 
-  void moveToWrokshopsPage() {
+  void moveToWorkshopsPage() {
     _onItemTapped(2);
   }
 
@@ -28,7 +28,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _widgetOptions = <Widget>[
-      OrdersMenuPage(changePage: moveToWrokshopsPage),
+      OrdersMenuPage(changePage: moveToWorkshopsPage),
       CarsMenuPage(),
       WorkshopsMenuPage(),
     ];
@@ -40,7 +40,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.calendar_today),
             label: 'Orders',
           ),
           BottomNavigationBarItem(
@@ -54,6 +54,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
     );

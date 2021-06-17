@@ -5,13 +5,15 @@ import 'package:nearby_car_service/helpers/upload_image.dart';
 import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/coords.dart';
+import 'package:nearby_car_service/models/employee.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/pages/shared/text_form_field.dart';
 import 'package:nearby_car_service/pages/shared/workshop_avatar.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
+import 'package:nearby_car_service/utils/employees_service.dart';
 import 'package:nearby_car_service/utils/location_service.dart';
 import 'package:nearby_car_service/utils/workshop_service.dart';
 import 'package:nearby_car_service/utils/services_service.dart';
@@ -62,8 +64,9 @@ class _WorkshopFormState extends State<WorkshopForm> {
 
   late ServicesDatabaseService servicesDatabaseService;
   late WorkshopDatabaseService workshopDatabaseService;
-  late DatabaseService databaseService;
-  late DatabaseService appUserService;
+  late EmployeesDatabaseService employeesDatabaseService;
+  late AppUserDatabaseService databaseService;
+  late AppUserDatabaseService appUserService;
   final GlobalKey<FormState> _workshopFormFormFormKey = GlobalKey<FormState>();
 
   void changeWorkshopAvatar(avatar) {
@@ -87,10 +90,15 @@ class _WorkshopFormState extends State<WorkshopForm> {
         String streetNumber = _streetNumberController.text.trim();
         String city = _cityController.text.trim();
 
-        Coords coords = await getCoordsFromAddress(street, streetNumber, city);
+        Coords? coords = await getCoordsFromAddress(street, streetNumber, city);
+
+        if (coords == null) {
+          setState(() => error = "Location seems to be invalid, please check");
+          return;
+        }
 
         Address address = Address(
-            street: street,
+            street: street.trim(),
             streetNumber: streetNumber,
             city: city,
             zipCode: _zipCodeController.text.trim(),
@@ -111,11 +119,21 @@ class _WorkshopFormState extends State<WorkshopForm> {
           DocumentReference doc =
               await workshopDatabaseService.createWorkshop(workshop);
 
+          Employee employee = Employee(
+              workshopUid: doc.id,
+              appUserUid: appUserUid,
+              position: 'OWNER',
+              isConfirmed: true,
+              isConfirmedByOwner: true,
+              isConfirmedByEmployee: true);
+
+          await employeesDatabaseService.createEmployee(employee);
+
           servicesDatabaseService =
               ServicesDatabaseService(workshopUid: doc.id);
 
           await servicesDatabaseService.addDefaultServices();
-          await databaseService.addAppUserRole(ROLES.OWNER);
+          await databaseService.addAppUserOwnerEmployeeRole();
           await databaseService.updateAppUserOnboardingStep(4);
         }
 
@@ -195,11 +213,15 @@ class _WorkshopFormState extends State<WorkshopForm> {
   Widget build(BuildContext context) {
     final appUser = Provider.of<AppUser?>(context);
 
-    databaseService = DatabaseService(
+    databaseService = AppUserDatabaseService(
       uid: appUser!.uid,
     );
 
     workshopDatabaseService = WorkshopDatabaseService(
+      appUserUid: appUser.uid,
+    );
+
+    employeesDatabaseService = EmployeesDatabaseService(
       appUserUid: appUser.uid,
     );
 

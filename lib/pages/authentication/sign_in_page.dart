@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nearby_car_service/helpers/is_email_valid.dart';
-import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
 
 import '../shared/text_form_field.dart';

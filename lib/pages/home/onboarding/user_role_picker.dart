@@ -3,7 +3,7 @@ import 'package:nearby_car_service/models/app_user.dart';
 
 import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
 import 'package:nearby_car_service/pages/shared/button.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 import 'package:provider/provider.dart';
 
 class UserRolePicker extends StatefulWidget {
@@ -20,7 +20,7 @@ class _UserRolePickerState extends State<UserRolePicker> {
   String _pickedRole = ROLES.CLIENT;
 
   Future<void> handleSubmit(String uid) async {
-    DatabaseService databaseService = DatabaseService(uid: uid);
+    AppUserDatabaseService databaseService = AppUserDatabaseService(uid: uid);
     await databaseService.updateAppUserRole([_pickedRole]);
     widget.goNext();
   }

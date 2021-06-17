@@ -55,11 +55,14 @@ dependencies:
   streaming_shared_preferences: ^2.0.0
   square_in_app_payments: ^1.7.1
   flutter_dotenv: ^5.0.0
+  url_launcher: ^6.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   test: ^1.16.5
+  mockito: ^5.0.10
+  rxdart: ^0.27.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

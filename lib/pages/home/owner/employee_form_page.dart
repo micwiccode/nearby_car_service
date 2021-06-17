@@ -2,6 +2,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/capitalize.dart';
 import 'package:nearby_car_service/helpers/is_email_valid.dart';
+import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/employee.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
@@ -9,6 +10,7 @@ import 'package:nearby_car_service/pages/shared/text_form_field.dart';
 import 'package:nearby_car_service/utils/employees_service.dart';
 
 import 'package:nearby_car_service/consts/employee_positions.dart' as POSITIONS;
+import 'package:provider/provider.dart';
 
 class EmployeeFormPage extends StatefulWidget {
   final Employee? employee;
@@ -45,7 +47,9 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
     return _employeeFormFormFormKey.currentState!.validate();
   }
 
-  Future<void> handleUpdateEmployee() async {
+  Future<void> handleUpdateEmployee(
+      {required BuildContext context,
+      required String currentAppUserUid}) async {
     if (isValidStep()) {
       setState(() => _isLoading = true);
 
@@ -56,7 +60,10 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
       } else {
         try {
           await employeesDatabaseEmployee.inviteEmployeeToWorkshop(
-              email: _emailController.text.trim(), position: _position);
+              email: _emailController.text.trim(),
+              position: _position,
+              context: context,
+              currentAppUserUid: currentAppUserUid);
 
           Navigator.of(context).pop();
         } catch (err) {
@@ -68,16 +75,17 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
     }
   }
 
-  Widget formInner() {
+  Widget formInner(
+      {required BuildContext context, required String currentAppUserUid}) {
     return Container(
-      margin: new EdgeInsets.all(25.0),
+      margin: EdgeInsets.all(25.0),
       child: SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               if (widget.employee == null)
                 TextFormFieldWidget(
-                  labelText: 'Employee account email',
+                  labelText: 'Employee user email',
                   controller: _emailController,
                   functionValidate: () {
                     if (!isEmailValid(_emailController.text.trim())) {
@@ -95,8 +103,11 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
               Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Button(
-                      text: 'Add',
-                      onPressed: handleUpdateEmployee,
+                      text:
+                          widget.employee == null ? 'Send invitation' : 'Save',
+                      onPressed: () => handleUpdateEmployee(
+                          context: context,
+                          currentAppUserUid: currentAppUserUid),
                       isLoading: _isLoading)),
             ]),
       ),
@@ -120,6 +131,12 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
       workshopUid: widget.workshopUid,
     );
 
+    final appUser = Provider.of<AppUser?>(context);
+
+    if (appUser == null) {
+      return Text('No appUser provided');
+    }
+
     return Scaffold(
       appBar: AppBar(
           title: Text(
@@ -133,7 +150,9 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
             ),
           )),
       body: Center(
-        child: Form(key: _employeeFormFormFormKey, child: formInner()),
+        child: Form(
+            key: _employeeFormFormFormKey,
+            child: formInner(context: context, currentAppUserUid: appUser.uid)),
       ),
     );
   }

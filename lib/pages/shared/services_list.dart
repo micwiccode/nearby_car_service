@@ -4,13 +4,13 @@ import 'package:nearby_car_service/pages/shared/service_tile.dart';
 
 class ServicesList extends StatefulWidget {
   final List<Service> services;
-  final Function? openServiceForm;
+  final Function? onServiceTileTap;
   final bool isEditable;
 
   ServicesList(
       {required this.services,
       required this.isEditable,
-      this.openServiceForm,
+      this.onServiceTileTap,
       Key? key})
       : super(key: key);
 
@@ -35,7 +35,7 @@ class _ServicesListState extends State<ServicesList> {
         service: service,
         isEditable: widget.isEditable,
         tileColor: tileColor,
-        onTap: widget.openServiceForm,
+        onTap: widget.onServiceTileTap,
         isServiceActive: isServiceActive);
   }
 
@@ -43,7 +43,8 @@ class _ServicesListState extends State<ServicesList> {
   Widget build(BuildContext context) {
     return widget.services.length < 1
         ? Center(child: Text('No services'))
-        : Column(
+        : ListView(
+            shrinkWrap: true,
             children: widget.services.map((Service service) {
               return _buildTile(service);
             }).toList(),

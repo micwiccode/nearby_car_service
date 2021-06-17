@@ -1,14 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 
-class DatabaseService {
+import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
+
+class AppUserDatabaseService {
   final String uid;
-  DatabaseService({required this.uid});
+  AppUserDatabaseService({required this.uid});
   static final CollectionReference collection =
       FirebaseFirestore.instance.collection('appUsers');
 
   Future createAppUser(AppUser user) async {
-    return collection.add({
+    return collection.doc(user.uid).set({
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'email': user.email,
+      'phoneNumber': user.phoneNumber,
+      'roles': user.roles,
+      'avatar': user.avatar,
+      'onboardingStep': user.onboardingStep ?? 1,
+    });
+  }
+
+  Future setAppUser(AppUser user) async {
+    return collection.doc(user.uid).set({
       'firstName': user.firstName,
       'lastName': user.lastName,
       'email': user.email,
@@ -31,15 +45,18 @@ class DatabaseService {
   }
 
   Future updateAppUser(AppUser user) async {
-    return collection.doc(uid).update({
+    return collection.doc(user.uid).update({
       'firstName': user.firstName,
       'lastName': user.lastName,
-      'email': user.email,
       'phoneNumber': user.phoneNumber,
       'roles': user.roles,
       'avatar': user.avatar,
       'onboardingStep': user.onboardingStep ?? 1,
     });
+  }
+
+  Future<bool> isAppUserExists() async {
+    return (await collection.doc(uid).get()).exists;
   }
 
   Future updateAppUserRole(List<String> roles) async {
@@ -53,6 +70,12 @@ class DatabaseService {
   Future addAppUserRole(String role) async {
     return collection.doc(uid).update({
       "roles": FieldValue.arrayUnion([role])
+    });
+  }
+
+  Future addAppUserOwnerEmployeeRole() async {
+    return collection.doc(uid).update({
+      "roles": FieldValue.arrayUnion([ROLES.OWNER, ROLES.EMPLOYEE])
     });
   }
 

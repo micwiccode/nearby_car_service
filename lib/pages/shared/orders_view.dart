@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nearby_car_service/models/car.dart';
 import 'package:nearby_car_service/models/order.dart';
 import 'package:nearby_car_service/utils/orders_service.dart';
 
@@ -17,12 +18,12 @@ class OrdersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void openOrderDetailsPage(Order order) {
+    void openOrderDetailsPage(Order order, Car car) {
       Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (BuildContext context) =>
-              OrderDetailsPage(orderUid: order.uid, employeeUid: employeeUid),
+          builder: (BuildContext context) => OrderDetailsPage(
+              orderUid: order.uid, car: car, employeeUid: employeeUid),
           fullscreenDialog: true,
         ),
       );

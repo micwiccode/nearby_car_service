@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/is_email_valid.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
@@ -32,14 +33,19 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() {
         _isLoading = true;
       });
-      dynamic result = await _auth.signUp(
-          _emailController.text.trim(), _passwordController.text.trim());
-      if (result == null) {
+
+      try {
+        await _auth.signUp(
+            _emailController.text.trim(), _passwordController.text.trim());
+      } on FirebaseAuthException catch (error) {
         setState(() {
-          _error = 'Network error';
-          _isLoading = false;
+          _error = error.message!;
         });
       }
+
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -83,8 +89,8 @@ class _SignUpPageState extends State<SignUpPage> {
             controller: _passwordController,
             functionValidate: () {
               String trimmedPassword = _passwordController.text.trim();
-              if (trimmedPassword.length < 5) {
-                return 'Please enter password 5+ characters';
+              if (trimmedPassword.length < 6) {
+                return 'Please enter password 6 <= characters';
               }
               if (_repeatPasswordController.text.trim() != trimmedPassword) {
                 return 'Passwords are not eqaul';

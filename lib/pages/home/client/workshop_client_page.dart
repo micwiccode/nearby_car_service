@@ -34,26 +34,24 @@ class _WorkshopClientPageState extends State<WorkshopClientPage> {
           title: Text(widget.workshop.name),
           backgroundColor: Colors.amber,
         ),
-        body: Container(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 80),
-            child: SingleChildScrollView(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                  WorkshopView(
-                    workshop: widget.workshop,
-                  ),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-                      child: Text('Services',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18.0))),
-                  ServicesView(
-                      workshop: widget.workshop,
-                      onlyActive: true,
-                      isEditable: false),
-                ]))),
+        body: ListView(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            children: <Widget>[
+              WorkshopView(workshop: widget.workshop),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                  child: Text('Services',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18.0))),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 80),
+                child: ServicesView(
+                    workshopUid: widget.workshop.uid,
+                    onlyActive: true,
+                    isEditable: false),
+              ),
+            ]),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton(
           onPressed: openCreateOrderPage,

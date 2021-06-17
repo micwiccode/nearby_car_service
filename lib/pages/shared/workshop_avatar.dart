@@ -53,8 +53,8 @@ class WorkshopAvatar extends StatelessWidget {
               placeholder: (context, url) => LoadingSpinner(),
             )),
       Positioned(
-        bottom: -15.0,
-        right: -15.0,
+        bottom: -20.0,
+        right: -20.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: IconButton(

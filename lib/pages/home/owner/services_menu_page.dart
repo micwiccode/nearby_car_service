@@ -3,8 +3,7 @@ import 'package:nearby_car_service/models/service.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/services_view.dart';
 import 'package:provider/provider.dart';
-
-import 'service_form_page.dart';
+import '../owner/service_form_page.dart';
 
 class SerivcesMenuPage extends StatefulWidget {
   const SerivcesMenuPage({Key? key}) : super(key: key);
@@ -16,38 +15,39 @@ class SerivcesMenuPage extends StatefulWidget {
 class _SerivcesMenuPageState extends State<SerivcesMenuPage> {
   bool _isEditable = false;
 
-  void openServiceForm(Service? service, String? workshopUid) {
-    Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) => ServiceFormPage(
-            service: service,
-            workshopUid:
-                workshopUid == null ? service!.workshopUid : workshopUid),
-        fullscreenDialog: true,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final workshop = Provider.of<Workshop?>(context);
 
     if (workshop == null) {
-      return Text('No services');
+      return Text('No workshop provided');
+    }
+
+    void onServiceTileTap(Service? service) {
+      if (_isEditable) {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => ServiceFormPage(
+                service: service,
+                workshopUid:
+                    service == null ? workshop.uid : service.workshopUid),
+            fullscreenDialog: true,
+          ),
+        );
+      }
     }
 
     return Scaffold(
-        body: SingleChildScrollView(
-            child: ServicesView(
-                workshop: workshop,
-                isEditable: false,
-                openServiceForm: openServiceForm)),
+        body: ServicesView(
+            workshopUid: workshop.uid,
+            isEditable: false,
+            onServiceTileTap: onServiceTileTap),
         floatingActionButton: FloatingActionButton(
           mini: _isEditable,
           onPressed: () {
             if (_isEditable) {
-              openServiceForm(null, workshop.uid);
+              onServiceTileTap(null);
             } else {
               setState(() {
                 _isEditable = !_isEditable;

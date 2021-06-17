@@ -43,7 +43,7 @@ class OrdersDatabaseService {
     }
   }
 
-  Map<String, dynamic> _getStatusTimeMap(String status, String employeeUid) {
+  Map<String, dynamic> _getStatusTimeMap(String status, String? employeeUid) {
     switch (status) {
       case STATUSES.ACCEPTED:
         {
@@ -72,6 +72,15 @@ class OrdersDatabaseService {
           };
         }
 
+      case STATUSES.PAID:
+        {
+          return {
+            'date': DateTime.now(),
+            'type': ORDER_EVENTS.PAID,
+            'employeeUid': employeeUid
+          };
+        }
+
       default:
         {
           return {
@@ -84,9 +93,10 @@ class OrdersDatabaseService {
   }
 
   Future updateOrderStatus(
-      String orderUid, String employeeUid, String status) async {
+      String orderUid, String? employeeUid, String status) async {
+    print(status);
     return collection.doc(orderUid).update({
-      'status': status,
+      "status": status,
       "events": FieldValue.arrayUnion([_getStatusTimeMap(status, employeeUid)])
     });
   }
@@ -131,6 +141,17 @@ class OrdersDatabaseService {
           'content': content
         }
       ])
+    });
+  }
+
+  Future<void> removeWorkshopOrders(String workshopUid) async {
+    return collection
+        .where("workshopUid", isEqualTo: workshopUid)
+        .snapshots()
+        .forEach((element) {
+      for (QueryDocumentSnapshot snapshot in element.docs) {
+        snapshot.reference.delete();
+      }
     });
   }
 
@@ -214,24 +235,7 @@ class OrdersDatabaseService {
         workshopUid: order.data()!['workshopUid'] ?? '',
         price: order.data()!['price'] ?? '',
         services: services,
-        status: order.data()!['isActive'] ?? STATUSES.NEW,
-        events: events
-        // createdAt: createdAtTimestamp != null
-        //     ? DateTime.fromMicrosecondsSinceEpoch(
-        //         createdAtTimestamp.microsecondsSinceEpoch)
-        //     : null,
-        // accepteddAt: accepteddAtTimestamp != null
-        //     ? (DateTime.fromMicrosecondsSinceEpoch(
-        //         accepteddAtTimestamp.microsecondsSinceEpoch))
-        //     : null,
-        // progressedAt: progressedAtTimestamp != null
-        //     ? (DateTime.fromMicrosecondsSinceEpoch(
-        //         progressedAtTimestamp.microsecondsSinceEpoch))
-        //     : null,
-        // doneAt: doneAtTimestamp != null
-        //     ? (DateTime.fromMicrosecondsSinceEpoch(
-        //         doneAtTimestamp.microsecondsSinceEpoch))
-        //     : null,
-        );
+        status: order.data()!['status'] ?? STATUSES.NEW,
+        events: events);
   }
 }

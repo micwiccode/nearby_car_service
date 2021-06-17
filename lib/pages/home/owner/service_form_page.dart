@@ -56,7 +56,7 @@ class _ServiceFormPageState extends State<ServiceFormPage> {
         });
 
         Service service = Service(
-          name: _nameController.text,
+          name: _nameController.text.trim(),
           minPrice: (_minPriceController.numberValue * 100).toInt(),
           isActive: _isActive,
         );

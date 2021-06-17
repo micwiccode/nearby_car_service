@@ -62,6 +62,7 @@ class ServicesDatabaseService {
   Stream<List<Service>> get myWorkshopServices {
     return collection
         .where("workshopUid", isEqualTo: workshopUid)
+        .orderBy('isActive', descending: true)
         .snapshots()
         .map(_servicesFromSnapshot);
   }

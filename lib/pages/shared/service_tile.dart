@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/helpers/formatPrice.dart';
+import 'package:nearby_car_service/helpers/format_price.dart';
 import 'package:nearby_car_service/models/service.dart';
 
 class ServiceTile extends StatelessWidget {
@@ -34,7 +34,7 @@ class ServiceTile extends StatelessWidget {
         subtitle: Text('Min price: ${formatPrice(service.minPrice)}',
             style: TextStyle(color: tileColor)),
         onTap: () {
-          if (onTap != null && isEditable) {
+          if (onTap != null) {
             onTap!(service);
           }
         });

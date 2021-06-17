@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 
-import 'database.dart';
 import 'notifications_service.dart';
+import 'user_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -34,10 +34,7 @@ class AuthService {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      String uid = user!.uid;
-      AppUser appUser = AppUser(uid: uid, email: email);
-      await DatabaseService(uid: uid).createAppUser(appUser);
-      await getAndSaveUserToken(user.uid);
+      await getAndSaveUserToken(user!.uid);
       return _userFromFirebase(user);
     } catch (e) {
       print(e.toString());
@@ -46,19 +43,14 @@ class AuthService {
   }
 
   Future<AppUser?> signUp(String email, String password) async {
-    try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      User? user = result.user;
-      String uid = user!.uid;
-      AppUser appUser = AppUser(uid: uid, email: email);
-      await DatabaseService(uid: uid).createAppUser(appUser);
-      await getAndSaveUserToken(user.uid);
-      return _userFromFirebase(user);
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
+    UserCredential result = await _auth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    User? user = result.user;
+    String uid = user!.uid;
+    AppUser appUser = AppUser(uid: uid, email: email);
+    await AppUserDatabaseService(uid: uid).setAppUser(appUser);
+    await getAndSaveUserToken(user.uid);
+    return _userFromFirebase(user);
   }
 
   Future<AppUser?> signInWithGoogle({required BuildContext context}) async {
@@ -83,6 +75,15 @@ class AuthService {
         final UserCredential userCredential =
             await auth.signInWithCredential(credential);
 
+        User? user = userCredential.user;
+        String uid = user!.uid;
+        String email = user.email ?? '';
+        AppUser appUser = AppUser(uid: uid, email: email);
+
+        if (!(await AppUserDatabaseService(uid: uid).isAppUserExists())) {
+          await AppUserDatabaseService(uid: uid).setAppUser(appUser);
+        }
+
         user = userCredential.user;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
@@ -101,7 +102,7 @@ class AuthService {
   }
 
   Future<void> getAndSaveUserToken(String appUserUid) async {
-    NotificationsService notificationService = NotificationsService();
+    AppNotificationsService notificationService = AppNotificationsService();
     await notificationService.getAndSaveToken(appUserUid);
   }
 

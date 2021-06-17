@@ -1,8 +1,16 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:nearby_car_service/models/employee.dart';
+import 'package:nearby_car_service/models/notification.dart';
 
-class NotificationsService {
+import 'employees_service.dart';
+
+class AppNotificationsService {
+  final String? receiverUserUid;
+
+  AppNotificationsService({this.receiverUserUid});
+
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   final CollectionReference tokensCollection =
@@ -14,16 +22,98 @@ class NotificationsService {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<void> createNotification(String receiverUserUid,
-      String notificationText, String employeeUid) async {
-    DocumentSnapshot doc = await tokensCollection.doc(receiverUserUid).get();
-    String token = doc['token'];
+  Future<void> createAppNotification(AppNotification notification) async {
+    // DocumentSnapshot doc = await tokensCollection.doc(receiverUserUid).get();
+    // String token = doc['token'];
 
     notificationsCollection.add({
-      'token': token,
-      'text': notificationText,
-      'employeeId': employeeUid,
+      'receiverUserUid': notification.receiverUserUid,
+      'senderUid': notification.senderUid,
+      'type': notification.type,
+      'isSeen': notification.isSeen,
+      'isAccepted': notification.isAccepted,
+      'isRejected': notification.isRejected,
     });
+  }
+
+  Future<void> acceptInvitation(
+      String workshopUid, String appUserUid, String notificationUid) async {
+    Employee? employee = await EmployeesDatabaseService()
+        .findAlreadyAddedByOwnerEmployee(
+            workshopUid: workshopUid, appUserUid: appUserUid);
+
+    if (employee == null) {
+      throw ('No employee find');
+    }
+    String employeeUid = employee.uid;
+
+    await EmployeesDatabaseService().acceptWorkshopInvitation(employeeUid);
+    return notificationsCollection.doc(notificationUid).update({
+      'isAccepted': true,
+    });
+  }
+
+  Future<void> rejectInvitation(String notificationUid) async {
+    return notificationsCollection.doc(notificationUid).update({
+      'isRejected': true,
+    });
+  }
+
+  Future<void> removeWorkshopNotifications(String workshopUid) async {
+    return notificationsCollection
+        .where("senderUid", isEqualTo: workshopUid)
+        .snapshots()
+        .forEach((element) {
+      for (QueryDocumentSnapshot snapshot in element.docs) {
+        snapshot.reference.delete();
+      }
+    });
+  }
+
+  Future<void> removeEmployeeNotifications({
+    required String senderUid,
+    required String receiverUserUid,
+  }) async {
+    print(senderUid);
+    print(receiverUserUid);
+    return await notificationsCollection
+        .where("receiverUserUid", isEqualTo: receiverUserUid)
+        .where("senderUid", isEqualTo: senderUid)
+        .snapshots()
+        .forEach((element) {
+      if (element.docs.length > 0) {
+        element.docs.forEach((QueryDocumentSnapshot snapshot) async {
+          await snapshot.reference.delete();
+        });
+        return;
+      }
+    });
+  }
+
+  Stream<List<AppNotification>> get userNotifications {
+    return notificationsCollection
+        .where("receiverUserUid", isEqualTo: receiverUserUid)
+        .where("isAccepted", isEqualTo: false)
+        .snapshots()
+        .map(_notificationsFromSnapshot);
+  }
+
+  List<AppNotification> _notificationsFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((employee) {
+      return _mapAppNotification(employee);
+    }).toList();
+  }
+
+  AppNotification _mapAppNotification(notification) {
+    return AppNotification(
+      uid: notification.id,
+      receiverUserUid: notification.data()!['receiverUserUid'] ?? '',
+      senderUid: notification.data()!['senderUid'] ?? '',
+      type: notification.data()!['type'] ?? '',
+      isSeen: notification.data()!['isSeen'] ?? false,
+      isAccepted: notification.data()!['isAccepted'] ?? false,
+      isRejected: notification.data()!['isRejected'] ?? false,
+    );
   }
 
   Future initialise() async {

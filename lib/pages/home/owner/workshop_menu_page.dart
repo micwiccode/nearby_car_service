@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/helpers/is_avatar_defined.dart';
-import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';

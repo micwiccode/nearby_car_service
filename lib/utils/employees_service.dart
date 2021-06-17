@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/employee.dart';
+import 'package:nearby_car_service/models/notification.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
-import 'database.dart';
+import 'user_service.dart';
 import 'notifications_service.dart';
-import 'workshop_service.dart';
 
 class EmployeesDatabaseService {
   final String? workshopUid;
@@ -26,8 +27,17 @@ class EmployeesDatabaseService {
     });
   }
 
-  Future removeEmployee(String employeeUid) async {
-    await collection.doc(employeeUid).delete();
+  Future removeEmployee(Employee employee) async {
+    AppNotificationsService notificationService = AppNotificationsService();
+    print(employee);
+    print(employee.workshopUid);
+    print(employee.appUserUid);
+
+    await collection.doc(employee.uid).delete();
+    await notificationService.removeEmployeeNotifications(
+        senderUid: employee.workshopUid, receiverUserUid: employee.appUserUid);
+
+    print('done');
   }
 
   Future<void> updateEmployeePosition(
@@ -38,15 +48,35 @@ class EmployeesDatabaseService {
   }
 
   Future<void> inviteEmployeeToWorkshop(
-      {required String email, required String position}) async {
-    AppUser? appUser = await DatabaseService.getAppUserWithEmail(email);
+      {required String email,
+      required String position,
+      required String currentAppUserUid,
+      required BuildContext context,
+      bool enableResend = false}) async {
+    AppUser? appUser = await AppUserDatabaseService.getAppUserWithEmail(email);
 
     if (appUser == null) {
       throw 'No user with such email address';
     }
 
+    if (appUser.uid == currentAppUserUid) {
+      throw 'You can not add yourself';
+    }
+
     if (workshopUid == null) {
       throw 'No workshopUid provided';
+    }
+
+    Employee? alreadyDefinedEmployee = await findAlreadyAddedByOwnerEmployee(
+        workshopUid: workshopUid!, appUserUid: appUser.uid);
+
+    if (alreadyDefinedEmployee != null) {
+      if (alreadyDefinedEmployee.isConfirmedByOwner &&
+          alreadyDefinedEmployee.isConfirmedByEmployee) {
+        throw 'User is already your workshop employee';
+      } else if (!enableResend) {
+        throw 'Invitation was already send to employee';
+      }
     }
 
     Employee employee = Employee(
@@ -55,11 +85,16 @@ class EmployeesDatabaseService {
         position: position,
         isConfirmedByOwner: true);
 
-    String employeeUid = (await createEmployee(employee)).id;
+    await createEmployee(employee);
 
-    NotificationsService notificationService = NotificationsService();
-    await notificationService.createNotification(
-        appUser.uid, 'You have a pending invitation to workshop', employeeUid);
+    AppNotificationsService notificationService = AppNotificationsService();
+
+    AppNotification notification = AppNotification(
+        senderUid: workshopUid!,
+        type: 'INVITATION',
+        receiverUserUid: appUser.uid);
+
+    await notificationService.createAppNotification(notification);
   }
 
   Future<void> sendRegistrationToWorkshop(
@@ -70,8 +105,18 @@ class EmployeesDatabaseService {
         appUserUid: appUserUid, workshopUid: workshopUid);
 
     if (employee != null) {
+      if (employee.isConfirmedByOwner && employee.isConfirmedByEmployee) {
+        throw 'You are already an employee of that workshop';
+      }
+
       await acceptWorkshopInvitation(employee.uid);
-      await setPreferencesEmployeeWorkshopUid(workshopUid, appUserUid);
+
+      AppNotificationsService notificationService = AppNotificationsService();
+      await notificationService.removeEmployeeNotifications(
+          senderUid: employee.workshopUid,
+          receiverUserUid: employee.appUserUid);
+
+      await setSteamPreferencesEmployeeWorkshopUid(workshopUid, appUserUid);
     } else {
       Employee employee = Employee(
           workshopUid: workshopUid,
@@ -79,15 +124,19 @@ class EmployeesDatabaseService {
           position: position,
           isConfirmedByEmployee: true);
 
-      String employeeUid = (await createEmployee(employee)).id;
-
-      String receiverUserUid =
-          await WorkshopDatabaseService.getWorkshopAppUserUid(workshopUid);
-
-      NotificationsService notificationService = NotificationsService();
-      await notificationService.createNotification(
-          receiverUserUid, 'Please add me to your workshop', employeeUid);
+      await createEmployee(employee);
     }
+  }
+
+  Future<void> removeWorkshopEmployees(String workshopUid) async {
+    return collection
+        .where("workshopUid", isEqualTo: workshopUid)
+        .snapshots()
+        .forEach((element) {
+      for (QueryDocumentSnapshot snapshot in element.docs) {
+        snapshot.reference.delete();
+      }
+    });
   }
 
   Future<Employee?> findAlreadyAddedByOwnerEmployee(

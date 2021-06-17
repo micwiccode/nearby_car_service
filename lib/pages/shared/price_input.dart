@@ -23,6 +23,9 @@ class PriceInput extends StatelessWidget {
           if (value != null && value.trim().isEmpty) {
             return 'Please enter price';
           }
+          //  if (value < 0) {
+          //   return 'Please enter price';
+          // }
           return null;
         },
         decoration: InputDecoration(

@@ -14,6 +14,17 @@ Future<void> setSteamPreferencesUserRole(String role, String userUid) async {
   prefs.setString('CURRENT_ROLE_$userUid', role);
 }
 
+Preference<String> getSteamPreferencesEmployeeWorkshopUid(
+    StreamingSharedPreferences prefs, String userUid) {
+  return prefs.getString('EMLOYEE_WORKSHOP_UID_$userUid', defaultValue: '');
+}
+
+Future<void> setSteamPreferencesEmployeeWorkshopUid(
+    String workshopUid, String userUid) async {
+  final prefs = await StreamingSharedPreferences.instance;
+  prefs.setString('EMLOYEE_WORKSHOP_UID_$userUid', workshopUid);
+}
+
 Future<String?> getPreferencesUserRole(String userUid) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('CURRENT_ROLE_$userUid');

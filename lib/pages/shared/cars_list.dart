@@ -18,7 +18,6 @@ class CarsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      scrollDirection: Axis.vertical,
       shrinkWrap: true,
       children: cars.map((Car car) {
         return CarTile(car: car, onTap: onTap, isEditable: isEditable);

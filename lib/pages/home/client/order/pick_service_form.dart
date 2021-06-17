@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/helpers/formatPrice.dart';
+import 'package:nearby_car_service/helpers/format_price.dart';
 import 'package:nearby_car_service/models/service.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';

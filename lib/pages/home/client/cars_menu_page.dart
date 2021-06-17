@@ -51,7 +51,7 @@ class _CarsMenuPageState extends State<CarsMenuPage> {
                     onTap: handleOpenCarForm),
             floatingActionButton: FloatingActionButton(
               onPressed: () => handleOpenCarForm(null),
-              child: const Icon(Icons.add),
+              child: Icon(Icons.add),
             ));
       },
     );

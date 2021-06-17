@@ -53,12 +53,15 @@ class _SlideUpRolesPanelState extends State<SlideUpRolesPanel> {
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
       child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
         ...buildRadioButtons(),
-        Button(
-            text: 'Continue',
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onSelect(_selectedRole);
-            })
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Button(
+              text: 'Continue',
+              onPressed: () {
+                Navigator.pop(context);
+                widget.onSelect(_selectedRole);
+              }),
+        )
       ]),
     );
   }

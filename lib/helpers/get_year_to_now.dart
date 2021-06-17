@@ -1,7 +1,7 @@
-
-
 List<int> getYearsToNow(int startYear) {
-  return new List<int>.generate(
-      new DateTime.now().year - startYear, (i) => new DateTime.now().year - i);
+  if (startYear < 0) {
+    return [];
+  }
+  return new List<int>.generate(new DateTime.now().year - startYear + 1,
+      (i) => new DateTime.now().year - i);
 }
-

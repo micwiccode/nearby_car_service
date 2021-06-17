@@ -8,6 +8,7 @@ import 'package:nearby_car_service/models/car.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/car_avatar.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
+import 'package:nearby_car_service/pages/shared/text_form_field.dart';
 import 'package:nearby_car_service/utils/cars_database.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -63,12 +64,12 @@ class _CarFormPageState extends State<CarFormPage> {
   }
 
   Widget formInner(String appUserUid) {
-    bool isValidStep() {
+    bool isValid() {
       return _carFormFormFormKey.currentState!.validate();
     }
 
     Future<void> handleUpdateCarForm() async {
-      if (isValidStep()) {
+      if (isValid()) {
         setState(() => _isLoading = true);
         String? avatarUrl =
             await uploadImage(_avatar, 'cars/$appUserUid/${Uuid().v1()}');
@@ -97,14 +98,20 @@ class _CarFormPageState extends State<CarFormPage> {
     }
 
     return Container(
-      margin: new EdgeInsets.all(25.0),
+      margin: EdgeInsets.all(25.0),
       child: SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               CarAvatar(_avatar, changeCarAvatar),
-              buildTextField('Car mark', _markController),
-              buildTextField('Car model', _modelController),
+              TextFormFieldWidget(
+                labelText: 'Car mark',
+                controller: _markController,
+              ),
+              TextFormFieldWidget(
+                  labelText: 'Car model',
+                  controller: _modelController,
+                  isLastFormInput: true),
               buildDropdown('Fuel', _fuelType, enumToList(FuelType.values),
                   changeCarFuelType),
               buildDropdown('Production year', _productionYear,
@@ -117,41 +124,6 @@ class _CarFormPageState extends State<CarFormPage> {
                       onPressed: handleUpdateCarForm,
                       isLoading: _isLoading)),
             ]),
-      ),
-    );
-  }
-
-  Widget buildTextField(String text, controller) {
-    return Padding(
-      padding: EdgeInsets.all(10.0),
-      child: TextFormField(
-        controller: controller,
-        validator: (String? value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'Please enter $text';
-          }
-          return null;
-        },
-        decoration: InputDecoration(
-          labelText: text,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-            borderSide: BorderSide(
-              color: Colors.grey,
-              width: 0.8,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5.0),
-            borderSide: BorderSide(
-              color: Colors.grey,
-              width: 0.8,
-            ),
-          ),
-          contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 5.0, 5.0),
-          filled: true,
-          fillColor: Colors.white,
-        ),
       ),
     );
   }

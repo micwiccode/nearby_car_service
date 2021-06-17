@@ -1,18 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/capitalize.dart';
-import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 import 'package:nearby_car_service/pages/shared/button.dart';
 import 'package:nearby_car_service/pages/shared/error_message.dart';
-import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/pages/shared/workshops_search_input.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 import 'package:nearby_car_service/utils/employees_service.dart';
-import 'package:nearby_car_service/utils/workshop_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:nearby_car_service/consts/employee_positions.dart' as POSITIONS;
@@ -26,7 +22,7 @@ class NewEmployeeForm extends StatefulWidget {
 }
 
 class _NewEmployeeFormState extends State<NewEmployeeForm> {
-  late DatabaseService databaseService;
+  late AppUserDatabaseService databaseService;
   final GlobalKey<FormState> _employeeFormKey = GlobalKey<FormState>();
   String _error = '';
   bool _isLoading = false;
@@ -50,16 +46,19 @@ class _NewEmployeeFormState extends State<NewEmployeeForm> {
       EmployeesDatabaseService employeesDatabaseService =
           EmployeesDatabaseService(workshopUid: selectedWorkshopUid);
 
-      await employeesDatabaseService.sendRegistrationToWorkshop(
-          workshopUid: selectedWorkshopUid,
-          position: _selectedPosition,
-          appUserUid: appUserUid);
+      try {
+        await employeesDatabaseService.sendRegistrationToWorkshop(
+            workshopUid: selectedWorkshopUid,
+            position: _selectedPosition,
+            appUserUid: appUserUid);
 
-      await databaseService.addAppUserRole(ROLES.EMPLOYEE);
-      await databaseService.updateAppUserOnboardingStep(4);
+        await databaseService.addAppUserRole(ROLES.EMPLOYEE);
+        await databaseService.updateAppUserOnboardingStep(4);
 
-      await setPreferencesUserRole(ROLES.EMPLOYEE, appUserUid);
-
+        await setPreferencesUserRole(ROLES.EMPLOYEE, appUserUid);
+      } catch (err) {
+        setState(() => _error = err.toString());
+      }
       setState(() => _isLoading = false);
     }
   }
@@ -79,13 +78,12 @@ class _NewEmployeeFormState extends State<NewEmployeeForm> {
             label: label,
             items: items,
             validator: (v) => v == null ? "This field is required" : null,
-            hint: "Select a country",
             showClearButton: true,
             onChanged: onChanged));
   }
 
   Widget _buildNewEmployeeForm(String appUserUid) {
-    return (Container(
+    return Container(
         child: Column(children: <Widget>[
       WorkshopsSearchInput(
           label: 'Workshop',
@@ -103,14 +101,14 @@ class _NewEmployeeFormState extends State<NewEmployeeForm> {
               text: 'Next',
               onPressed: () => sendRegistrationToWorkshop(appUserUid),
               isLoading: _isLoading)),
-    ])));
+    ]));
   }
 
   @override
   Widget build(BuildContext context) {
     final appUser = Provider.of<AppUser?>(context);
 
-    databaseService = DatabaseService(
+    databaseService = AppUserDatabaseService(
       uid: appUser!.uid,
     );
 

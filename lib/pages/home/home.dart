@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/utils/auth_service.dart';
@@ -24,7 +24,7 @@ class Home extends StatelessWidget {
     }
 
     return StreamBuilder<AppUser>(
-        stream: DatabaseService(uid: appUser!.uid).appUser,
+        stream: AppUserDatabaseService(uid: appUser!.uid).appUser,
         initialData: null,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

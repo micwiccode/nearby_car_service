@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/pages/home/onboarding/owner_form.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
@@ -21,10 +21,11 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  late DatabaseService databaseService;
+  late AppUserDatabaseService databaseService;
   int _step = 1;
 
   Future<void> skipOnboarding() async {
+    print('here');
     await databaseService.updateAppUserOnboardingStep(4);
   }
 
@@ -57,7 +58,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
 
     AppUser? appUser = Provider.of<AppUser?>(context);
-    databaseService = DatabaseService(uid: appUser!.uid);
+    databaseService = AppUserDatabaseService(uid: appUser!.uid);
 
     if (widget.user != null && widget.user!.onboardingStep != null) {
       initateOnbordingStep();

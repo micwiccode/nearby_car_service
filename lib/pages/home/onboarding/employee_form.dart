@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/pages/shared/commonForms/new_employee_from.dart';
+import 'package:nearby_car_service/pages/shared/commonForms/new_employee_form.dart';
 
 class EmployeeForm extends StatefulWidget {
   const EmployeeForm({Key? key}) : super(key: key);

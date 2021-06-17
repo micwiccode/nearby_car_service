@@ -3,6 +3,10 @@ import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/coords.dart';
 import 'package:nearby_car_service/models/workshop.dart';
 
+import 'employees_service.dart';
+import 'notifications_service.dart';
+import 'orders_service.dart';
+
 class WorkshopDatabaseService {
   final String? appUserUid;
   final String? workshopUid;
@@ -66,6 +70,9 @@ class WorkshopDatabaseService {
   }
 
   Future removeWorkshop(String workshopUid) async {
+    await EmployeesDatabaseService().removeWorkshopEmployees(workshopUid);
+    await OrdersDatabaseService().removeWorkshopOrders(workshopUid);
+    await AppNotificationsService().removeWorkshopNotifications(workshopUid);
     return collection.doc(workshopUid).delete();
   }
 

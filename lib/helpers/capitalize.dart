@@ -1,2 +1,2 @@
 String capitalize(String s) =>
-    s[0].toUpperCase() + s.substring(1).toLowerCase();
+    s.length == 0 ? "" : s[0].toUpperCase() + s.substring(1).toLowerCase();

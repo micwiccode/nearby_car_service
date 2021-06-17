@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nearby_car_service/helpers/formatPrice.dart';
+import 'package:nearby_car_service/helpers/format_price.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/car.dart';
 import 'package:nearby_car_service/models/order.dart';
@@ -9,7 +9,7 @@ import 'package:nearby_car_service/pages/shared/car_tile.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/pages/shared/service_tile.dart';
 import 'package:nearby_car_service/pages/shared/workshop_tile.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 
 class ConfirmOrderForm extends StatelessWidget {
   final String appUserUid;
@@ -42,7 +42,7 @@ class ConfirmOrderForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<AppUser>(
-        stream: DatabaseService(uid: appUserUid).appUser,
+        stream: AppUserDatabaseService(uid: appUserUid).appUser,
         initialData: null,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -74,7 +74,7 @@ class ConfirmOrderForm extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabel('User'),
+                  _buildLabel('Client'),
                   _buildText('${user.firstName} ${user.lastName}'),
                   _buildText('${user.email}, ${user.phoneNumber}'),
                   _buildLabel('Car'),

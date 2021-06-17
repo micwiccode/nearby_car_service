@@ -11,22 +11,24 @@ class Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () => onPressed(),
-      style: ElevatedButton.styleFrom(
-        primary: Colors.amber[600],
-        padding: EdgeInsets.symmetric(horizontal: 80, vertical: 12),
-        textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-        shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(30.0),
-        ),
-      ),
-      child: isLoading
-          ? LoadingSpinner(isButtonLoading: true)
-          : Text(
-              text,
-              style: TextStyle(color: Colors.black),
+    return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () => onPressed(),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.amber[600],
+            padding: EdgeInsets.symmetric(horizontal: 80, vertical: 12),
+            textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0),
             ),
-    );
+          ),
+          child: isLoading
+              ? LoadingSpinner(isButtonLoading: true)
+              : Text(
+                  text,
+                  style: TextStyle(color: Colors.black),
+                ),
+        ));
   }
 }

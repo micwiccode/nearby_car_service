@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/employee.dart';
+import 'package:nearby_car_service/pages/shared/confirm_dialog.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 import 'package:nearby_car_service/utils/employees_service.dart';
+import 'package:provider/provider.dart';
 
 import 'employee_form_page.dart';
 
@@ -34,38 +36,71 @@ class _EmployeesListState extends State<EmployeesList> {
         EmployeesDatabaseService(workshopUid: widget.workshopUid);
   }
 
+  void onRemoveEmployee(Employee employee) {
+    print('here');
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => ConfirmDialog(
+            onAccept: () async {
+              print('remomve');
+              await employeesService.removeEmployee(employee);
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            onDeny: () {
+              Navigator.pop(context);
+            },
+            title: 'Do you really want to remove employee?'));
+  }
+
   void handleEmployeeTap(
       {required BuildContext context,
       required Employee employee,
-      required AppUser appUser}) {
-    late ListTile tile;
+      required AppUser appUser,
+      required String currentAppUserUid}) {
+    late ListTile? tile;
 
     if (_isInvitedByOwner(employee)) {
       tile = ListTile(
         leading: Icon(Icons.send, size: 30.0),
         title: Text('Resend invitation'),
-        onTap: () => employeesService.inviteEmployeeToWorkshop(
-            email: appUser.email!, position: employee.position),
+        onTap: () async {
+          await employeesService.inviteEmployeeToWorkshop(
+              email: appUser.email!,
+              position: employee.position,
+              currentAppUserUid: currentAppUserUid,
+              context: context,
+              enableResend: true);
+          Navigator.of(context).pop();
+        },
       );
-    } else {
+    } else if (_isNotConfirmed(employee)) {
       tile = ListTile(
         leading: Icon(Icons.check_circle_outlined, size: 30.0),
         title: Text('Accept employee registration'),
-        onTap: () => employeesService.acceptEmployeeRegistration(employee.uid),
+        onTap: () async {
+          employeesService.acceptEmployeeRegistration(employee.uid);
+          Navigator.of(context).pop();
+        },
       );
+    } else {
+      tile = null;
     }
 
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: ListView(children: [
-            tile,
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            tile != null ? tile : Container(),
             ListTile(
                 leading: Icon(Icons.cancel, size: 30.0),
                 title: Text('Remove'),
-                onTap: () => employeesService.removeEmployee(employee.uid))
+                onTap: () {
+                  Navigator.of(context).pop();
+                  onRemoveEmployee(employee);
+                })
           ]),
         );
       },
@@ -87,6 +122,10 @@ class _EmployeesListState extends State<EmployeesList> {
     return employee.isConfirmedByOwner && !employee.isConfirmedByEmployee;
   }
 
+  bool _isNotConfirmed(Employee employee) {
+    return !employee.isConfirmedByOwner;
+  }
+
   Color _getTileColor(Employee employee) {
     return _isInvitedByOwner(employee) ? Colors.black26 : Colors.black;
   }
@@ -95,8 +134,10 @@ class _EmployeesListState extends State<EmployeesList> {
     Color tileColor = _getTileColor(employee);
 
     return StreamBuilder<AppUser>(
-        stream: DatabaseService(uid: employee.appUserUid).appUser,
+        stream: AppUserDatabaseService(uid: employee.appUserUid).appUser,
         builder: (BuildContext context, snapshot) {
+          final loggedAppUser = Provider.of<AppUser?>(context);
+
           if (snapshot.hasError) {
             return Text('Something went wrong');
           }
@@ -107,8 +148,11 @@ class _EmployeesListState extends State<EmployeesList> {
 
           AppUser appUser = snapshot.data!;
 
+          bool isUserItself = loggedAppUser!.uid == appUser.uid;
+
           return ListTile(
-              trailing: Icon(Icons.more_horiz, size: 20.0),
+              trailing:
+                  !isUserItself ? Icon(Icons.more_horiz, size: 20.0) : null,
               leading: (appUser.avatar != null &&
                       appUser.avatar!.contains('/storage'))
                   ? CachedNetworkImage(
@@ -136,8 +180,13 @@ class _EmployeesListState extends State<EmployeesList> {
               subtitle:
                   Text(employee.position, style: TextStyle(color: tileColor)),
               onTap: () {
-                handleEmployeeTap(
-                    context: context, employee: employee, appUser: appUser);
+                if (!isUserItself) {
+                  handleEmployeeTap(
+                      context: context,
+                      employee: employee,
+                      appUser: appUser,
+                      currentAppUserUid: appUser.uid);
+                }
               });
         });
   }
@@ -147,12 +196,10 @@ class _EmployeesListState extends State<EmployeesList> {
     return Scaffold(
         body: widget.employees.length < 1
             ? Center(child: Text(widget.noDataText))
-            : SingleChildScrollView(
-                child: Column(
-                  children: widget.employees.map((Employee employee) {
-                    return _buildTile(employee);
-                  }).toList(),
-                ),
+            : ListView(
+                children: widget.employees.map((Employee employee) {
+                  return _buildTile(employee);
+                }).toList(),
               ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {

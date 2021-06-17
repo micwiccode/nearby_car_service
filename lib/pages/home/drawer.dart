@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:nearby_car_service/helpers/is_avatar_defined.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
+import 'package:nearby_car_service/pages/shared/notifications_page.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/pages/shared/slide_up_roles_panel_content.dart';
 
 import 'package:nearby_car_service/consts/app_user_roles.dart' as ROLES;
-import 'package:nearby_car_service/utils/database.dart';
+import 'package:nearby_car_service/utils/user_service.dart';
 
 class Pair<A, B> {
   final A role;
@@ -29,6 +30,16 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     String avatar = user.avatar ?? '';
     String drawerUserName = '${user.firstName!} ${user.lastName!}';
+
+    void handleOpenNotificationsPage() {
+      Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) => AppNotificationsPage(),
+          fullscreenDialog: true,
+        ),
+      );
+    }
 
     return FutureBuilder<Pair<String, List<String>>>(
         future: getUserRoles(user.roles!, user.uid),
@@ -74,9 +85,9 @@ class CustomDrawer extends StatelessWidget {
                 onTap: handleOpenProfilePage,
               ),
               ListTile(
-                title: Text('Settings'),
-                leading: Icon(Icons.settings),
-                onTap: handleSignOut,
+                title: Text('Notifications'),
+                leading: Icon(Icons.notifications),
+                onTap: handleOpenNotificationsPage,
               ),
               ...roleBasedTiles,
               ListTile(
@@ -117,8 +128,9 @@ buildRoleBasedTiles(
           context: context,
           roles: availableNewRoles,
           onSelect: (selectedRole) async {
-            await DatabaseService(uid: userUid).addAppUserRole(selectedRole);
-            await setPreferencesUserRole(selectedRole, userUid);
+            await AppUserDatabaseService(uid: userUid)
+                .addAppUserRole(selectedRole);
+            await setSteamPreferencesUserRole(selectedRole, userUid);
           }));
 
   Widget changeRoleTile = ListTile(
@@ -128,18 +140,14 @@ buildRoleBasedTiles(
           context: context,
           roles: userRoles,
           currentRole: currentRole,
-          onSelect: (selectedRole) {
-            setPreferencesUserRole(selectedRole, userUid);
+          onSelect: (selectedRole) async {
+            setSteamPreferencesUserRole(selectedRole, userUid);
           }));
 
-  if (userRoles.length < 3) {
-    if (availableNewRoles.length < 0) {
-      return [changeRoleTile];
-    } else {
-      return [changeRoleTile, createNewRoleTile];
-    }
+  if (availableNewRoles.length < 1) {
+    return [changeRoleTile];
   } else {
-    return null;
+    return [changeRoleTile, createNewRoleTile];
   }
 }
 

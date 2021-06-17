@@ -28,6 +28,11 @@ class OrderStatusText extends StatelessWidget {
           return Colors.green;
         }
 
+      case STATUSES.PAID:
+        {
+          return Colors.black;
+        }
+
       default:
         {
           return Colors.black;

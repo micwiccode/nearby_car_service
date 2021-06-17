@@ -28,8 +28,8 @@ class UserAvatar extends StatelessWidget {
     return Stack(children: [
       (avatar.contains('/storage')
           ? Container(
-              width: 75,
-              height: 75,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -40,8 +40,8 @@ class UserAvatar extends StatelessWidget {
           : CachedNetworkImage(
               imageUrl: avatar,
               imageBuilder: (context, imageProvider) => Container(
-                width: 75,
-                height: 75,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
@@ -73,7 +73,7 @@ class UserAvatar extends StatelessWidget {
       Icon(
         Icons.account_circle,
         color: Colors.black,
-        size: 75.0,
+        size: 100.0,
       ),
       Positioned(
         bottom: -5.0,

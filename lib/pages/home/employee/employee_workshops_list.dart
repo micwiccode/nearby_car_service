@@ -4,12 +4,13 @@ import 'package:nearby_car_service/models/address.dart';
 import 'package:nearby_car_service/models/app_user.dart';
 import 'package:nearby_car_service/models/employee.dart';
 import 'package:nearby_car_service/models/workshop.dart';
-import 'package:nearby_car_service/pages/shared/commonForms/new_employee_from.dart';
 import 'package:nearby_car_service/pages/shared/loading_spinner.dart';
 import 'package:nearby_car_service/pages/shared/shared_preferences.dart';
 import 'package:nearby_car_service/utils/employees_service.dart';
 import 'package:nearby_car_service/utils/workshop_service.dart';
 import 'package:provider/provider.dart';
+
+import 'new_employee_page.dart';
 
 class EmployeeWorkshopsList extends StatefulWidget {
   final List<String> employeeWorkshopUids;
@@ -40,35 +41,39 @@ class _EmployeeWorkshopsListState extends State<EmployeeWorkshopsList> {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => NewEmployeeForm(),
+        builder: (BuildContext context) => NewEmployeePage(),
         fullscreenDialog: true,
       ),
     );
   }
 
-  void openSwitchWorkshopSlideUp(String workshopUid, String userUid) {
+  void openSwitchWorkshopSlideUp(Workshop workshop, String userUid) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: ListView(children: [
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
             ListTile(
                 leading: Icon(Icons.business_center_outlined, size: 30.0),
                 title: Text('Switch to this workshop'),
-                onTap: () =>
-                    setPreferencesEmployeeWorkshopUid(workshopUid, userUid)),
-            ListTile(
-                leading: Icon(Icons.cancel, size: 30.0),
-                title: Text('Remove'),
                 onTap: () async {
-                  Employee? employee = await employeesService
-                      .getEmployeeByUserAndWorkshop(workshopUid, userUid);
+                  await setSteamPreferencesEmployeeWorkshopUid(
+                      workshop.uid, userUid);
+                  Navigator.of(context).pop();
+                }),
+            if (workshop.appUserUid == userUid)
+              ListTile(
+                  leading: Icon(Icons.cancel, size: 30.0),
+                  title: Text('Remove'),
+                  onTap: () async {
+                    Employee? employee = await employeesService
+                        .getEmployeeByUserAndWorkshop(workshop.uid, userUid);
 
-                  if (employee != null) {
-                    employeesService.removeEmployee(employee.uid);
-                  }
-                })
+                    if (employee != null) {
+                      employeesService.removeEmployee(employee);
+                    }
+                  })
           ]),
         );
       },
@@ -99,7 +104,9 @@ class _EmployeeWorkshopsListState extends State<EmployeeWorkshopsList> {
           Address address = workshop.address!;
 
           return ListTile(
-              trailing: !isActive ? Icon(Icons.more_horiz, size: 20.0) : null,
+              trailing: !isActive || workshop.appUserUid == userUid
+                  ? Icon(Icons.more_horiz, size: 20.0)
+                  : null,
               title: Text(workshop.name,
                   style:
                       TextStyle(fontWeight: FontWeight.w700, color: tileColor)),
@@ -128,8 +135,8 @@ class _EmployeeWorkshopsListState extends State<EmployeeWorkshopsList> {
                       size: 25.0,
                     ),
               onTap: () {
-                if (!isActive) {
-                  openSwitchWorkshopSlideUp(workshop.uid, userUid);
+                if (!isActive || workshop.appUserUid == userUid) {
+                  openSwitchWorkshopSlideUp(workshop, userUid);
                 }
               });
         });
@@ -164,7 +171,10 @@ class _EmployeeWorkshopsListState extends State<EmployeeWorkshopsList> {
                     children: [
                     _buildLabel('Active workshop'),
                     if (activeWorkshopUid == '')
-                      Text('No active workshop')
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(16.0, 10, 16.0, 16.0),
+                        child: Text('No active workshop'),
+                      )
                     else
                       _buildTile(activeWorkshopUid, appUser!.uid),
                     if (inactiveWorkshopUids.length > 0)

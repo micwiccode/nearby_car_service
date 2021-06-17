@@ -67,6 +67,13 @@ class TextFormFieldWidget extends StatelessWidget {
                   width: 0.8,
                 ),
               ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+                borderSide: BorderSide(
+                  color: Colors.red,
+                  width: 0.8,
+                ),
+              ),
               contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 5.0, 5.0),
               filled: true,
               fillColor: Colors.white,
