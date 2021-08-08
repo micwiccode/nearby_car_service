@@ -59,9 +59,9 @@ Below some screens of most important views:
     <td>Edit car form (client view)</td>
   </tr>
   <tr>
-    <td><img src="readme_images/r4.jpg" width=270 height=500></td>
-    <td><img src="readme_images/r5.jpg" width=270 height=500></td>
-    <td><img src="readme_images/r6.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r4.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r5.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r6.jpg" width=270 height=540></td>
   </tr>
   </table>
   
@@ -96,10 +96,10 @@ Below some screens of most important views:
    
    <table>
   <tr>
-    <td>Orders list (employee/wner view)</td>
-    <td>Order details (employee/wner view)</td>
-    <td>Employees list (employee/wner view)</td>
-    <td>Workshop view (employee/wner view)</td>
+    <td>Orders list (employee/owner view)</td>
+    <td>Order details (employee/owner view)</td>
+    <td>Employees list (employee/owner view)</td>
+    <td>Workshop view (employee/owner view)</td>
   </tr>
    </tr>
     <td><img src="readme_images/r15.jpg" width=270 height=500></td>
