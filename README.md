@@ -45,10 +45,10 @@ Below some screens of most important views:
     <td>User profile form</td>
   </tr>
   <tr>
-    <td><img src="readme_images/r0.jpg" width=270 height=560></td>
-    <td><img src="readme_images/r1.jpg" width=270 height=560></td>
-    <td><img src="readme_images/r2.jpg" width=270 height=560></td>
-    <td><img src="readme_images/r3.jpg" width=270 height=560></td>
+    <td><img src="readme_images/r0.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r1.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r2.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r3.jpg" width=270 height=500></td>
   </tr>
   </table>
   
@@ -59,9 +59,9 @@ Below some screens of most important views:
     <td>Edit car form (client view)</td>
   </tr>
   <tr>
-    <td><img src="readme_images/r4.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r5.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r6.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r4.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r5.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r6.jpg" width=270 height=500></td>
   </tr>
   </table>
   
@@ -73,10 +73,10 @@ Below some screens of most important views:
     <td>Create order - last step pick summary (client view)</td>
   </tr>
    <tr>
-    <td><img src="readme_images/r7.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r8.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r9.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r10.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r7.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r8.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r9.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r10.jpg" width=270 height=500></td>
   </tr>
   </table>
  
@@ -87,10 +87,10 @@ Below some screens of most important views:
     <td>Pay for order - summary (client view)</td>
     <td>Pay for order - add card (client view)</td>
   </tr>
-    <td><img src="readme_images/r11.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r12.jpg" width=270 height=540></td>
-   <td><img src="readme_images/r13.jpg" width=270 height=540></td>
-   <td><img src="readme_images/r14.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r11.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r12.jpg" width=270 height=500></td>
+   <td><img src="readme_images/r13.jpg" width=270 height=500></td>
+   <td><img src="readme_images/r14.jpg" width=270 height=500></td>
   </tr>
    </table>
    
@@ -102,10 +102,10 @@ Below some screens of most important views:
     <td>Workshop view (employee/wner view)</td>
   </tr>
    </tr>
-    <td><img src="readme_images/r15.jpg" width=270 height=540></td>
-    <td><img src="readme_images/r16.jpg" width=270 height=540></td>
-   <td><img src="readme_images/r17.jpg" width=270 height=540></td>
-   <td><img src="readme_images/r18.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r15.jpg" width=270 height=500></td>
+    <td><img src="readme_images/r16.jpg" width=270 height=500></td>
+   <td><img src="readme_images/r17.jpg" width=270 height=500></td>
+   <td><img src="readme_images/r18.jpg" width=270 height=500></td>
   </tr>
  </table>
 
