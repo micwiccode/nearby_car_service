@@ -45,55 +45,67 @@ Below some screens of most important views:
     <td>User profile form</td>
   </tr>
   <tr>
+    <td><img src="readme_images/r0.jpg" width=270 height=560></td>
+    <td><img src="readme_images/r1.jpg" width=270 height=560></td>
+    <td><img src="readme_images/r2.jpg" width=270 height=560></td>
+    <td><img src="readme_images/r3.jpg" width=270 height=560></td>
+  </tr>
+  </table>
+  
+  <table>
+  <tr>
     <td>User's cars (client view)</td>
     <td>Add car form (client view)</td>
     <td>Edit car form (client view)</td>
   </tr>
+  <tr>
+    <td><img src="readme_images/r4.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r5.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r6.jpg" width=270 height=540></td>
+  </tr>
+  </table>
+  
+  <table>
   <tr>
     <td>Search workshop - map (client view)</td>
     <td>Workshop main view deatils (client view)</td>
     <td>Create order - first step pick services (client view)</td>
     <td>Create order - last step pick summary (client view)</td>
   </tr>
+   <tr>
+    <td><img src="readme_images/r7.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r8.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r9.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r10.jpg" width=270 height=540></td>
+  </tr>
+  </table>
+ 
+  <table>
   <tr>
     <td>Orders list (client view)</td>
     <td>Order details (client view)</td>
     <td>Pay for order - summary (client view)</td>
     <td>Pay for order - add card (client view)</td>
   </tr>
+    <td><img src="readme_images/r11.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r12.jpg" width=270 height=540></td>
+   <td><img src="readme_images/r13.jpg" width=270 height=540></td>
+   <td><img src="readme_images/r14.jpg" width=270 height=540></td>
+  </tr>
+   </table>
+   
+   <table>
   <tr>
     <td>Orders list (employee/wner view)</td>
     <td>Order details (employee/wner view)</td>
     <td>Employees list (employee/wner view)</td>
     <td>Workshop view (employee/wner view)</td>
   </tr>
-  <tr>
-    <td><img src="readme_images/r0.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r1.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r2.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r3.jpg" width=270 height=580></td>
-  </tr>
-  <tr>
-    <td><img src="readme_images/r4.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r5.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r6.jpg" width=270 height=580></td>
-  </tr>
-   <tr>
-    <td><img src="readme_images/r7.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r8.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r9.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r10.jpg" width=270 height=580></td>
-  </tr>
-    <td><img src="readme_images/r11.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r12.jpg" width=270 height=580></td>
-   <td><img src="readme_images/r13.jpg" width=270 height=580></td>
-   <td><img src="readme_images/r14.jpg" width=270 height=580></td>
-  </tr>
    </tr>
-    <td><img src="readme_images/r15.jpg" width=270 height=580></td>
-    <td><img src="readme_images/r16.jpg" width=270 height=580></td>
-   <td><img src="readme_images/r17.jpg" width=270 height=580></td>
-   <td><img src="readme_images/r18.jpg" width=270 height=580></td>
+    <td><img src="readme_images/r15.jpg" width=270 height=540></td>
+    <td><img src="readme_images/r16.jpg" width=270 height=540></td>
+   <td><img src="readme_images/r17.jpg" width=270 height=540></td>
+   <td><img src="readme_images/r18.jpg" width=270 height=540></td>
   </tr>
  </table>
 
